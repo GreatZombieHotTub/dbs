@@ -1,0 +1,1561 @@
+
+SQL> create table employee(Empno number(10) primary key, empno varchar(20) not null, gender char(1) NOT NULL CHECK (gender IN('M', 'F')), salary number(7) not null, address varchar(30) not null);
+create table employee(Empno number(10) primary key, empno varchar(20) not null, gender char(1) NOT NULL CHECK (gender IN('M', 'F')), salary number(7) not null, address varchar(30) not null)
+                                                    *
+ERROR at line 1:
+ORA-00957: duplicate column name
+
+
+SQL> create table employee(Empno number(10) primary key, empname varchar(20) not null, gender char(1) NOT NULL CHECK (gender IN('M', 'F')), salary number(7) not null, address varchar(30) not null);
+
+Table created.
+
+SQL> create table department (deptno number(10) primary key, deptname varchar(20) candidate key);
+create table department (deptno number(10) primary key, deptname varchar(20) candidate key)
+                                                                             *
+ERROR at line 1:
+ORA-00907: missing right parenthesis
+
+
+SQL> create table department (deptno number(10) primary key, deptname varchar(20) UNIQUE);
+
+Table created.
+
+SQL> alter table employee (dno number(10) REFERENCES department(deptno));
+alter table employee (dno number(10) REFERENCES department(deptno))
+                     *
+ERROR at line 1:
+ORA-01735: invalid ALTER TABLE option
+
+
+SQL> alter table employee FOREIGN KEY dno  REFERENCES department(deptno);
+alter table employee FOREIGN KEY dno  REFERENCES department(deptno)
+                     *
+ERROR at line 1:
+ORA-01735: invalid ALTER TABLE option
+
+
+SQL> alter table employee (ADD FOREIGN KEY dno  REFERENCES department(deptno));
+alter table employee (ADD FOREIGN KEY dno  REFERENCES department(deptno))
+                     *
+ERROR at line 1:
+ORA-01735: invalid ALTER TABLE option
+
+
+SQL> alter table employee ADD FOREIGN KEY dno REFERENCES department(deptno);
+alter table employee ADD FOREIGN KEY dno REFERENCES department(deptno)
+                                     *
+ERROR at line 1:
+ORA-00906: missing left parenthesis
+
+
+SQL> alter table employee ADD FOREIGN KEY (dno) REFERENCES department(deptno);
+alter table employee ADD FOREIGN KEY (dno) REFERENCES department(deptno)
+                                      *
+ERROR at line 1:
+ORA-00904: "DNO": invalid identifier
+
+
+SQL> ALTER TABLE employee
+  2  ADD FOREIGN KEY (dno)
+  3
+SQL> ALTER TABLE employee add(foreign key (dno) references department(deptno));
+ALTER TABLE employee add(foreign key (dno) references department(deptno))
+                                      *
+ERROR at line 1:
+ORA-00904: "DNO": invalid identifier
+
+
+SQL> ALTER TABLE employee add(dno number(10), foreign key (dno) references department(deptno));
+
+Table altered.
+
+SQL> insert into employee values(1, 'abc', M, 9000, 'udupi', 10);
+insert into employee values(1, 'abc', M, 9000, 'udupi', 10)
+                                      *
+ERROR at line 1:
+ORA-00984: column not allowed here
+
+
+SQL> insert into employee values(1, 'abc', 'M', 9000, 'udupi', 10);
+insert into employee values(1, 'abc', 'M', 9000, 'udupi', 10)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.SYS_C0014332) violated - parent key not
+found
+
+
+SQL> insert into department values(10, 'CSE');
+
+1 row created.
+
+SQL> insert into employee values(1, 'abc', 'M', 9000, 'udupi', 10);
+
+1 row created.
+
+SQL> insert into department values(9, 'ITC');
+
+1 row created.
+
+SQL> insert into department values(2, 'ECE');
+
+1 row created.
+
+SQL> insert into employee values(2, 'efg', 'F', 10000, 'manipal', 9);
+
+1 row created.
+
+SQL> insert into employee values(19, 'hridini', 'F', 10000, 'ahm', 9);
+
+1 row created.
+
+SQL> insert into employee values(5, 'aish', 'M', 7000, 'delhi', 2);
+
+1 row created.
+
+SQL> insert into employee values(6, 'ayush', 'M', null, 'gurgaon', 9);
+insert into employee values(6, 'ayush', 'M', null, 'gurgaon', 9)
+                                             *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("ITB39"."EMPLOYEE"."SALARY")
+
+
+SQL> insert into employee values(6, 'ayush', 'M', 0, 'gurgaon', 3);
+insert into employee values(6, 'ayush', 'M', 0, 'gurgaon', 3)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.SYS_C0014332) violated - parent key not
+found
+
+
+SQL> insert into employee values(6, 'ayush', 'male', 0, 'gurgaon', 3);
+insert into employee values(6, 'ayush', 'male', 0, 'gurgaon', 3)
+                                        *
+ERROR at line 1:
+ORA-12899: value too large for column "ITB39"."EMPLOYEE"."GENDER" (actual: 4,
+maximum: 1)
+
+
+SQL> insert into employee values(6, 'ayush', 'f', 0, 'gurgaon', 3);
+insert into employee values(6, 'ayush', 'f', 0, 'gurgaon', 3)
+*
+ERROR at line 1:
+ORA-02290: check constraint (ITB39.SYS_C0014156) violated
+
+
+SQL> delete from department where deptno=10;
+delete from department where deptno=10
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (ITB39.SYS_C0014332) violated - child record
+found
+
+
+SQL>
+SQL> select * from department
+  2
+SQL> select * from department;
+
+    DEPTNO DEPTNAME
+---------- --------------------
+        10 CSE
+         9 ITC
+         2 ECE
+
+SQL> select * from employee;
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO
+----------
+         1 abc                  M       9000 udupi
+        10
+
+         2 efg                  F      10000 manipal
+         9
+
+        19 hridini              F      10000 ahm
+         9
+
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO
+----------
+         5 aish                 M       7000 delhi
+         2
+
+
+SQL> alter table employee drop constraint SYS_C0014332;
+
+Table altered.
+
+SQL> alter table employee add constraint emp_dept foreign key(dno) references department(deptno) on delete cascade;
+
+Table altered.
+
+SQL> delete from department where deptno=2;
+
+1 row deleted.
+
+SQL> select * from employee;
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO
+----------
+         1 abc                  M       9000 udupi
+        10
+
+         2 efg                  F      10000 manipal
+         9
+
+        19 hridini              F      10000 ahm
+         9
+
+
+SQL> select * from department;
+
+    DEPTNO DEPTNAME
+---------- --------------------
+        10 CSE
+         9 ITC
+
+SQL> alter table employee MODIFY salary DEFAULT 10000 CONSTRAINT emp_sal;
+alter table employee MODIFY salary DEFAULT 10000 CONSTRAINT emp_sal
+                                                 *
+ERROR at line 1:
+ORA-02253: constraint specification not allowed here
+
+
+SQL> alter table employee MODIFY salary DEFAULT 10000;
+
+Table altered.
+
+SQL> insert into employee (10, 'xyz', 'M', 'pagalpur', 2);
+insert into employee (10, 'xyz', 'M', 'pagalpur', 2)
+                      *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword
+
+
+SQL> insert into employee values(10, 'xyz', 'M', 'pagalpur', 2);
+insert into employee values(10, 'xyz', 'M', 'pagalpur', 2)
+            *
+ERROR at line 1:
+ORA-00947: not enough values
+
+
+SQL> insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 2);
+insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 2)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.EMP_DEPT) violated - parent key not
+found
+
+
+SQL> insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 2);
+insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 2)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.EMP_DEPT) violated - parent key not
+found
+
+
+SQL> insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 9;
+insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 9
+                                                                                               *
+ERROR at line 1:
+ORA-00917: missing comma
+
+
+SQL> insert into employee (Empno, empname, gender, address, dno) values(10, 'xyz', 'M', 'pagalpur', 9);
+
+1 row created.
+
+SQL> select * from employee
+  2
+SQL> select * from employee;
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO
+----------
+         1 abc                  M       9000 udupi
+        10
+
+         2 efg                  F      10000 manipal
+         9
+
+        19 hridini              F      10000 ahm
+         9
+
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO
+----------
+        10 xyz                  M      10000 pagalpur
+         9
+
+
+SQL> alter table employee ADD(DOB DATE);
+
+Table altered.
+
+SQL> update employee set DOB=to_date('15-MAY-1995' 'DD-MON-YYYY') where Empno=1;
+update employee set DOB=to_date('15-MAY-1995' 'DD-MON-YYYY') where Empno=1
+                                              *
+ERROR at line 1:
+ORA-00907: missing right parenthesis
+
+
+SQL> update employee set DOB=to_date('15-MAY-1995', 'DD-MON-YYYY') where Empno=1;
+
+1 row updated.
+
+SQL> update employee set DOB=to_date('12021992', 'DDMMYYYY') where Empno=2;
+
+1 row updated.
+
+SQL> update employee set DOB=to_date('19092006', 'DD-MM-YYYY') where Empno=19;
+
+1 row updated.
+
+SQL> select * from employee;
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO DOB
+---------- ---------
+         1 abc                  M       9000 udupi
+        10 15-MAY-95
+
+         2 efg                  F      10000 manipal
+         9 12-FEB-92
+
+        19 hridini              F      10000 ahm
+         9 19-SEP-06
+
+
+     EMPNO EMPNAME              G     SALARY ADDRESS
+---------- -------------------- - ---------- ------------------------------
+       DNO DOB
+---------- ---------
+        10 xyz                  M      10000 pagalpur
+         9
+
+
+SQL> select empname, to_char(DOB, 'DD-MON-YY') from employee;
+
+EMPNAME              TO_CHAR(DOB,'DD-MO
+-------------------- ------------------
+abc                  15-MAY-95
+efg                  12-FEB-92
+hridini              19-SEP-06
+xyz
+
+SQL> select empname, to_char(DOB, 'DD-MON-YYYY') from employee;
+
+EMPNAME              TO_CHAR(DOB,'DD-MON-
+-------------------- --------------------
+abc                  15-MAY-1995
+efg                  12-FEB-1992
+hridini              19-SEP-2006
+xyz
+
+SQL> select empname, to_char(DOB, 'DD-MM-YY') from employee;
+
+EMPNAME              TO_CHAR(
+-------------------- --------
+abc                  15-05-95
+efg                  12-02-92
+hridini              19-09-06
+xyz
+
+SQL> select empname, to_char(DOB, 'YEAR') from employee;
+
+EMPNAME              TO_CHAR(DOB,'YEAR')
+-------------------- ------------------------------------------
+abc                  NINETEEN NINETY-FIVE
+efg                  NINETEEN NINETY-TWO
+hridini              TWO THOUSAND SIX
+xyz
+
+SQL> select empname, to_char(DOB, 'year') from employee;
+
+EMPNAME              TO_CHAR(DOB,'YEAR')
+-------------------- ------------------------------------------
+abc                  nineteen ninety-five
+efg                  nineteen ninety-two
+hridini              two thousand six
+xyz
+
+SQL> select empname, to_char(DOB, 'Year') from employee;
+
+EMPNAME              TO_CHAR(DOB,'YEAR')
+-------------------- ------------------------------------------
+abc                  Nineteen Ninety-Five
+efg                  Nineteen Ninety-Two
+hridini              Two Thousand Six
+xyz
+
+SQL> select empname, to_char(DOB, 'YYYY') from employee;
+
+EMPNAME              TO_C
+-------------------- ----
+abc                  1995
+efg                  1992
+hridini              2006
+xyz
+
+SQL> DROP TABLE department
+  2
+SQL> DROP TABLE department;
+DROP TABLE department
+           *
+ERROR at line 1:
+ORA-02449: unique/primary keys in table referenced by foreign keys
+
+
+SQL> DROP TABLE employee;
+
+Table dropped.
+
+SQL> DROP TABLE department;
+
+Table dropped.
+
+SQL> create table classroom
+  2     (building               varchar(15),
+  3      room_number    varchar(7),
+  4      capacity               numeric(4,0),
+  5      primary key (building, room_number)
+  6     );
+
+Table created.
+
+SQL>
+SQL> create table department
+  2     (dept_name              varchar(20),
+  3      building               varchar(15),
+  4      budget                 numeric(12,2) check (budget > 0),
+  5      primary key (dept_name)
+  6     );
+
+Table created.
+
+SQL>
+SQL> create table course
+  2     (course_id              varchar(8),
+  3      title                  varchar(50),
+  4      dept_name              varchar(20),
+  5      credits                numeric(2,0) check (credits > 0),
+  6      primary key (course_id),
+  7      foreign key (dept_name) references department
+  8             on delete set null
+  9     );
+
+Table created.
+
+SQL>
+SQL> create table instructor
+  2     (ID                     varchar(5),
+  3      name                   varchar(20) not null,
+  4      dept_name              varchar(20),
+  5      salary numeric(8,2) check (salary > 29000),
+  6      primary key (ID),
+  7      foreign key (dept_name) references department
+  8             on delete set null
+  9     );
+
+Table created.
+
+SQL>
+SQL> create table section
+  2     (course_id              varchar(8),
+  3           sec_id                    varchar(8),
+  4      semester               varchar(6)
+  5             check (semester in ('Fall', 'Winter', 'Spring', 'Summer')),
+  6      year                   numeric(4,0) check (year > 1701 and year < 2100),
+  7      building               varchar(15),
+  8      room_number            varchar(7),
+  9      time_slot_id           varchar(4),
+ 10      primary key (course_id, sec_id, semester, year),
+ 11      foreign key (course_id) references course
+ 12             on delete cascade,
+ 13      foreign key (building, room_number) references classroom
+ 14             on delete set null
+ 15     );
+
+Table created.
+
+SQL>
+SQL> create table teaches
+  2     (ID                     varchar(5),
+  3      course_id              varchar(8),
+  4      sec_id                 varchar(8),
+  5      semester               varchar(6),
+  6      year                   numeric(4,0),
+  7      primary key (ID, course_id, sec_id, semester, year),
+  8      foreign key (course_id,sec_id, semester, year) references section
+  9             on delete cascade,
+ 10      foreign key (ID) references instructor
+ 11             on delete cascade
+ 12     );
+
+Table created.
+
+SQL>
+SQL> create table student
+  2     (ID                     varchar(5),
+  3      name                   varchar(20) not null,
+  4      dept_name              varchar(20),
+  5      tot_cred               numeric(3,0) check (tot_cred >= 0),
+  6      primary key (ID),
+  7      foreign key (dept_name) references department
+  8             on delete set null
+  9     );
+
+Table created.
+
+SQL>
+SQL> create table takes
+  2     (ID                     varchar(5),
+  3      course_id              varchar(8),
+  4      sec_id                 varchar(8),
+  5      semester               varchar(6),
+  6      year                   numeric(4,0),
+  7      grade                  varchar(2),
+  8      primary key (ID, course_id, sec_id, semester, year),
+  9      foreign key (course_id,sec_id, semester, year) references section
+ 10             on delete cascade,
+ 11      foreign key (ID) references student
+ 12             on delete cascade
+ 13     );
+
+Table created.
+
+SQL>
+SQL> create table advisor
+  2     (s_ID                   varchar(5),
+  3      i_ID                   varchar(5),
+  4      primary key (s_ID),
+  5      foreign key (i_ID) references instructor (ID)
+  6             on delete set null,
+  7      foreign key (s_ID) references student (ID)
+  8             on delete cascade
+  9     );
+
+Table created.
+
+SQL>
+SQL> create table time_slot
+  2     (time_slot_id           varchar(4),
+  3      day                    varchar(1),
+  4      start_hr               numeric(2) check (start_hr >= 0 and start_hr < 24),
+  5      start_min              numeric(2) check (start_min >= 0 and start_min < 60),
+  6      end_hr                 numeric(2) check (end_hr >= 0 and end_hr < 24),
+  7      end_min                numeric(2) check (end_min >= 0 and end_min < 60),
+  8      primary key (time_slot_id, day, start_hr, start_min)
+  9     );
+
+Table created.
+
+SQL>
+SQL> create table prereq
+  2     (course_id              varchar(8),
+  3      prereq_id              varchar(8),
+  4      primary key (course_id, prereq_id),
+  5      foreign key (course_id) references course
+  6             on delete cascade,
+  7      foreign key (prereq_id) references course
+  8     );
+
+Table created.
+
+SQL>
+SQL> insert into classroom values ('Packard', '101', '500');
+
+1 row created.
+
+SQL> insert into classroom values ('Painter', '514', '10');
+
+1 row created.
+
+SQL> insert into classroom values ('Taylor', '3128', '70');
+
+1 row created.
+
+SQL> insert into classroom values ('Watson', '100', '30');
+
+1 row created.
+
+SQL> insert into classroom values ('Watson', '120', '50');
+
+1 row created.
+
+SQL> insert into department values ('Biology', 'Watson', '90000');
+
+1 row created.
+
+SQL> insert into department values ('Comp. Sci.', 'Taylor', '100000');
+
+1 row created.
+
+SQL> insert into department values ('Elec. Eng.', 'Taylor', '85000');
+
+1 row created.
+
+SQL> insert into department values ('Finance', 'Painter', '120000');
+
+1 row created.
+
+SQL> insert into department values ('History', 'Painter', '50000');
+
+1 row created.
+
+SQL> insert into department values ('Music', 'Packard', '80000');
+
+1 row created.
+
+SQL> insert into department values ('Physics', 'Watson', '70000');
+
+1 row created.
+
+SQL> insert into course values ('BIO-101', 'Intro. to Biology', 'Biology', '4');
+
+1 row created.
+
+SQL> insert into course values ('BIO-301', 'Genetics', 'Biology', '4');
+
+1 row created.
+
+SQL> insert into course values ('BIO-399', 'Computational Biology', 'Biology', '3');
+
+1 row created.
+
+SQL> insert into course values ('CS-101', 'Intro. to Computer Science', 'Comp. Sci.', '4');
+
+1 row created.
+
+SQL> insert into course values ('CS-190', 'Game Design', 'Comp. Sci.', '4');
+
+1 row created.
+
+SQL> insert into course values ('CS-315', 'Robotics', 'Comp. Sci.', '3');
+
+1 row created.
+
+SQL> insert into course values ('CS-319', 'Image Processing', 'Comp. Sci.', '3');
+
+1 row created.
+
+SQL> insert into course values ('CS-347', 'Database System Concepts', 'Comp. Sci.', '3');
+
+1 row created.
+
+SQL> insert into course values ('EE-181', 'Intro. to Digital Systems', 'Elec. Eng.', '3');
+
+1 row created.
+
+SQL> insert into course values ('FIN-201', 'Investment Banking', 'Finance', '3');
+
+1 row created.
+
+SQL> insert into course values ('HIS-351', 'World History', 'History', '3');
+
+1 row created.
+
+SQL> insert into course values ('MU-199', 'Music Video Production', 'Music', '3');
+
+1 row created.
+
+SQL> insert into course values ('PHY-101', 'Physical Principles', 'Physics', '4');
+
+1 row created.
+
+SQL> insert into instructor values ('10101', 'Srinivasan', 'Comp. Sci.', '65000');
+
+1 row created.
+
+SQL> insert into instructor values ('12121', 'Wu', 'Finance', '90000');
+
+1 row created.
+
+SQL> insert into instructor values ('15151', 'Mozart', 'Music', '40000');
+
+1 row created.
+
+SQL> insert into instructor values ('22222', 'Einstein', 'Physics', '95000');
+
+1 row created.
+
+SQL> insert into instructor values ('32343', 'El Said', 'History', '60000');
+
+1 row created.
+
+SQL> insert into instructor values ('33456', 'Gold', 'Physics', '87000');
+
+1 row created.
+
+SQL> insert into instructor values ('45565', 'Katz', 'Comp. Sci.', '75000');
+
+1 row created.
+
+SQL> insert into instructor values ('58583', 'Califieri', 'History', '62000');
+
+1 row created.
+
+SQL> insert into instructor values ('76543', 'Singh', 'Finance', '80000');
+
+1 row created.
+
+SQL> insert into instructor values ('76766', 'Crick', 'Biology', '72000');
+
+1 row created.
+
+SQL> insert into instructor values ('83821', 'Brandt', 'Comp. Sci.', '92000');
+
+1 row created.
+
+SQL> insert into instructor values ('98345', 'Kim', 'Elec. Eng.', '80000');
+
+1 row created.
+
+SQL> insert into section values ('BIO-101', '1', 'Summer', '2009', 'Painter', '514', 'B');
+
+1 row created.
+
+SQL> insert into section values ('BIO-301', '1', 'Summer', '2010', 'Painter', '514', 'A');
+
+1 row created.
+
+SQL> insert into section values ('CS-101', '1', 'Fall', '2009', 'Packard', '101', 'H');
+
+1 row created.
+
+SQL> insert into section values ('CS-101', '1', 'Spring', '2010', 'Packard', '101', 'F');
+
+1 row created.
+
+SQL> insert into section values ('CS-190', '1', 'Spring', '2009', 'Taylor', '3128', 'E');
+
+1 row created.
+
+SQL> insert into section values ('CS-190', '2', 'Spring', '2009', 'Taylor', '3128', 'A');
+
+1 row created.
+
+SQL> insert into section values ('CS-315', '1', 'Spring', '2010', 'Watson', '120', 'D');
+
+1 row created.
+
+SQL> insert into section values ('CS-319', '1', 'Spring', '2010', 'Watson', '100', 'B');
+
+1 row created.
+
+SQL> insert into section values ('CS-319', '2', 'Spring', '2010', 'Taylor', '3128', 'C');
+
+1 row created.
+
+SQL> insert into section values ('CS-347', '1', 'Fall', '2009', 'Taylor', '3128', 'A');
+
+1 row created.
+
+SQL> insert into section values ('EE-181', '1', 'Spring', '2009', 'Taylor', '3128', 'C');
+
+1 row created.
+
+SQL> insert into section values ('FIN-201', '1', 'Spring', '2010', 'Packard', '101', 'B');
+
+1 row created.
+
+SQL> insert into section values ('HIS-351', '1', 'Spring', '2010', 'Painter', '514', 'C');
+
+1 row created.
+
+SQL> insert into section values ('MU-199', '1', 'Spring', '2010', 'Packard', '101', 'D');
+
+1 row created.
+
+SQL> insert into section values ('PHY-101', '1', 'Fall', '2009', 'Watson', '100', 'A');
+
+1 row created.
+
+SQL> insert into teaches values ('10101', 'CS-101', '1', 'Fall', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('10101', 'CS-315', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('10101', 'CS-347', '1', 'Fall', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('12121', 'FIN-201', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('15151', 'MU-199', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('22222', 'PHY-101', '1', 'Fall', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('32343', 'HIS-351', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('45565', 'CS-101', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('45565', 'CS-319', '1', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('76766', 'BIO-101', '1', 'Summer', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('76766', 'BIO-301', '1', 'Summer', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('83821', 'CS-190', '1', 'Spring', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('83821', 'CS-190', '2', 'Spring', '2009');
+
+1 row created.
+
+SQL> insert into teaches values ('83821', 'CS-319', '2', 'Spring', '2010');
+
+1 row created.
+
+SQL> insert into teaches values ('98345', 'EE-181', '1', 'Spring', '2009');
+
+1 row created.
+
+SQL> insert into student values ('00128', 'Zhang', 'Comp. Sci.', '102');
+
+1 row created.
+
+SQL> insert into student values ('12345', 'Shankar', 'Comp. Sci.', '32');
+
+1 row created.
+
+SQL> insert into student values ('19991', 'Brandt', 'History', '80');
+
+1 row created.
+
+SQL> insert into student values ('23121', 'Chavez', 'Finance', '110');
+
+1 row created.
+
+SQL> insert into student values ('44553', 'Peltier', 'Physics', '56');
+
+1 row created.
+
+SQL> insert into student values ('45678', 'Levy', 'Physics', '46');
+
+1 row created.
+
+SQL> insert into student values ('54321', 'Williams', 'Comp. Sci.', '54');
+
+1 row created.
+
+SQL> insert into student values ('55739', 'Sanchez', 'Music', '38');
+
+1 row created.
+
+SQL> insert into student values ('70557', 'Snow', 'Physics', '0');
+
+1 row created.
+
+SQL> insert into student values ('76543', 'Brown', 'Comp. Sci.', '58');
+
+1 row created.
+
+SQL> insert into student values ('76653', 'Aoi', 'Elec. Eng.', '60');
+
+1 row created.
+
+SQL> insert into student values ('98765', 'Bourikas', 'Elec. Eng.', '98');
+
+1 row created.
+
+SQL> insert into student values ('98988', 'Tanaka', 'Biology', '120');
+
+1 row created.
+
+SQL> insert into takes values ('00128', 'CS-101', '1', 'Fall', '2009', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('00128', 'CS-347', '1', 'Fall', '2009', 'A-');
+
+1 row created.
+
+SQL> insert into takes values ('12345', 'CS-101', '1', 'Fall', '2009', 'C');
+
+1 row created.
+
+SQL> insert into takes values ('12345', 'CS-190', '2', 'Spring', '2009', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('12345', 'CS-315', '1', 'Spring', '2010', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('12345', 'CS-347', '1', 'Fall', '2009', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('19991', 'HIS-351', '1', 'Spring', '2010', 'B');
+
+1 row created.
+
+SQL> insert into takes values ('23121', 'FIN-201', '1', 'Spring', '2010', 'C+');
+
+1 row created.
+
+SQL> insert into takes values ('44553', 'PHY-101', '1', 'Fall', '2009', 'B-');
+
+1 row created.
+
+SQL> insert into takes values ('45678', 'CS-101', '1', 'Fall', '2009', 'F');
+
+1 row created.
+
+SQL> insert into takes values ('45678', 'CS-101', '1', 'Spring', '2010', 'B+');
+
+1 row created.
+
+SQL> insert into takes values ('45678', 'CS-319', '1', 'Spring', '2010', 'B');
+
+1 row created.
+
+SQL> insert into takes values ('54321', 'CS-101', '1', 'Fall', '2009', 'A-');
+
+1 row created.
+
+SQL> insert into takes values ('54321', 'CS-190', '2', 'Spring', '2009', 'B+');
+
+1 row created.
+
+SQL> insert into takes values ('55739', 'MU-199', '1', 'Spring', '2010', 'A-');
+
+1 row created.
+
+SQL> insert into takes values ('76543', 'CS-101', '1', 'Fall', '2009', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('76543', 'CS-319', '2', 'Spring', '2010', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('76653', 'EE-181', '1', 'Spring', '2009', 'C');
+
+1 row created.
+
+SQL> insert into takes values ('98765', 'CS-101', '1', 'Fall', '2009', 'C-');
+
+1 row created.
+
+SQL> insert into takes values ('98765', 'CS-315', '1', 'Spring', '2010', 'B');
+
+1 row created.
+
+SQL> insert into takes values ('98988', 'BIO-101', '1', 'Summer', '2009', 'A');
+
+1 row created.
+
+SQL> insert into takes values ('98988', 'BIO-301', '1', 'Summer', '2010', null);
+
+1 row created.
+
+SQL> insert into advisor values ('00128', '45565');
+
+1 row created.
+
+SQL> insert into advisor values ('12345', '10101');
+
+1 row created.
+
+SQL> insert into advisor values ('23121', '76543');
+
+1 row created.
+
+SQL> insert into advisor values ('44553', '22222');
+
+1 row created.
+
+SQL> insert into advisor values ('45678', '22222');
+
+1 row created.
+
+SQL> insert into advisor values ('76543', '45565');
+
+1 row created.
+
+SQL> insert into advisor values ('76653', '98345');
+
+1 row created.
+
+SQL> insert into advisor values ('98765', '98345');
+
+1 row created.
+
+SQL> insert into advisor values ('98988', '76766');
+
+1 row created.
+
+SQL> insert into time_slot values ('A', 'M', '8', '0', '8', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('A', 'W', '8', '0', '8', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('A', 'F', '8', '0', '8', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('B', 'M', '9', '0', '9', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('B', 'W', '9', '0', '9', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('B', 'F', '9', '0', '9', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('C', 'M', '11', '0', '11', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('C', 'W', '11', '0', '11', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('C', 'F', '11', '0', '11', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('D', 'M', '13', '0', '13', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('D', 'W', '13', '0', '13', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('D', 'F', '13', '0', '13', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('E', 'T', '10', '30', '11', '45 ');
+
+1 row created.
+
+SQL> insert into time_slot values ('E', 'R', '10', '30', '11', '45 ');
+
+1 row created.
+
+SQL> insert into time_slot values ('F', 'T', '14', '30', '15', '45 ');
+
+1 row created.
+
+SQL> insert into time_slot values ('F', 'R', '14', '30', '15', '45 ');
+
+1 row created.
+
+SQL> insert into time_slot values ('G', 'M', '16', '0', '16', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('G', 'W', '16', '0', '16', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('G', 'F', '16', '0', '16', '50');
+
+1 row created.
+
+SQL> insert into time_slot values ('H', 'W', '10', '0', '12', '30');
+
+1 row created.
+
+SQL> insert into prereq values ('BIO-301', 'BIO-101');
+
+1 row created.
+
+SQL> insert into prereq values ('BIO-399', 'BIO-101');
+
+1 row created.
+
+SQL> insert into prereq values ('CS-190', 'CS-101');
+
+1 row created.
+
+SQL> insert into prereq values ('CS-315', 'CS-101');
+
+1 row created.
+
+SQL> insert into prereq values ('CS-319', 'CS-101');
+
+1 row created.
+
+SQL> insert into prereq values ('CS-347', 'CS-101');
+
+1 row created.
+
+SQL> insert into prereq values ('EE-181', 'PHY-101');
+
+1 row created.
+
+SQL> select name, dept_name from student;
+
+NAME                 DEPT_NAME
+-------------------- --------------------
+Zhang                Comp. Sci.
+Shankar              Comp. Sci.
+Brandt               History
+Chavez               Finance
+Peltier              Physics
+Levy                 Physics
+Williams             Comp. Sci.
+Sanchez              Music
+Snow                 Physics
+Brown                Comp. Sci.
+Aoi                  Elec. Eng.
+
+NAME                 DEPT_NAME
+-------------------- --------------------
+Bourikas             Elec. Eng.
+Tanaka               Biology
+
+13 rows selected.
+
+SQL> select * from instructors;
+select * from instructors
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select * from instructor;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+10101 Srinivasan           Comp. Sci.                65000
+12121 Wu                   Finance                   90000
+15151 Mozart               Music                     40000
+22222 Einstein             Physics                   95000
+32343 El Said              History                   60000
+33456 Gold                 Physics                   87000
+45565 Katz                 Comp. Sci.                75000
+58583 Califieri            History                   62000
+76543 Singh                Finance                   80000
+76766 Crick                Biology                   72000
+83821 Brandt               Comp. Sci.                92000
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+98345 Kim                  Elec. Eng.                80000
+
+12 rows selected.
+
+SQL> select title from course where credits=3;
+
+TITLE
+--------------------------------------------------
+Computational Biology
+Robotics
+Image Processing
+Database System Concepts
+Intro. to Digital Systems
+Investment Banking
+World History
+Music Video Production
+
+8 rows selected.
+
+SQL> select title from course where credits=3 AND dept_name='CSE';
+
+no rows selected
+
+SQL> select title from course where credits=3 AND dept_name='Comp. Sci.';
+
+TITLE
+--------------------------------------------------
+Robotics
+Image Processing
+Database System Concepts
+
+SQL> select course.course_id, course.title FROM course, takes where course.course_id=takes.course_id and takes.ID=12345;
+
+COURSE_I TITLE
+-------- --------------------------------------------------
+CS-101   Intro. to Computer Science
+CS-190   Game Design
+CS-315   Robotics
+CS-347   Database System Concepts
+
+SQL> select * from instructor where salary BETWEEN 40000 AND 90000;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+10101 Srinivasan           Comp. Sci.                65000
+12121 Wu                   Finance                   90000
+15151 Mozart               Music                     40000
+32343 El Said              History                   60000
+33456 Gold                 Physics                   87000
+45565 Katz                 Comp. Sci.                75000
+58583 Califieri            History                   62000
+76543 Singh                Finance                   80000
+76766 Crick                Biology                   72000
+98345 Kim                  Elec. Eng.                80000
+
+10 rows selected.
+
+SQL> select ID from instructor where ID NOT IN(select ID from teaches);
+
+ID
+-----
+76543
+58583
+33456
+
+SQL> select name, title, year from student, course, section where student.dept_name=course.dept_name AND course.course_id=section.course_id AND section.room_number=303;
+
+no rows selected
+
+SQL> select student.name, course.title, section.year from student, course, section where student.dept_name=course.dept_name AND course.course_id=section.course_id AND section.room_number=303;
+
+no rows selected
+
+SQL> SELECT s.name, c.title, sec.year
+  2  FROM Student s, Takes t, Course c, Section sec
+  3  WHERE s.ID = t.ID
+  4    AND t.course_id = c.course_id
+  5    AND t.course_id = sec.course_id
+  6    AND t.sec_id = sec.section_id
+  7    AND t.semester = sec.semester
+  8    AND t.year = sec.year
+  9    AND sec.room_number = 303;
+  AND t.sec_id = sec.section_id
+                 *
+ERROR at line 6:
+ORA-00904: "SEC"."SECTION_ID": invalid identifier
+
+
+SQL> SELECT s.name, c.title, sec.year FROM student s, takes t, course c, section sec WHERE s.ID = t.ID AND t.course_id = c.course_id AND t.course_id = sec.course_id AND t.sec_id = sec.section_id AND t.semester = sec.semester AND t.year = sec.year AND sec.room_number = 303;
+SELECT s.name, c.title, sec.year FROM student s, takes t, course c, section sec WHERE s.ID = t.ID AND t.course_id = c.course_id AND t.course_id = sec.course_id AND t.sec_id = sec.section_id AND t.semester = sec.semester AND t.year = sec.year AND sec.room_number = 303
+                                                                                                                                                                               *
+ERROR at line 1:
+ORA-00904: "SEC"."SECTION_ID": invalid identifier
+
+
+SQL> SELECT s.name, c.title, sec.year FROM student s, takes t, course c, section sec WHERE s.ID = t.ID AND t.course_id = c.course_id AND t.course_id = sec.course_id AND t.sec_id = sec.sec_id AND t.semester = sec.semester AND t.year = sec.year AND sec.room_number = 303;
+
+no rows selected
+
+SQL> SELECT s.name, c.title, sec.year FROM student s, takes t, course c, section sec WHERE s.ID = t.ID AND t.course_id = c.course_id AND t.course_id = sec.course_id AND t.sec_id = sec.sec_id AND t.semester = sec.semester AND t.year = sec.year AND sec.room_number = 101;
+
+NAME                 TITLE
+-------------------- --------------------------------------------------
+      YEAR
+----------
+Zhang                Intro. to Computer Science
+      2009
+
+Shankar              Intro. to Computer Science
+      2009
+
+Levy                 Intro. to Computer Science
+      2009
+
+
+NAME                 TITLE
+-------------------- --------------------------------------------------
+      YEAR
+----------
+Levy                 Intro. to Computer Science
+      2010
+
+Williams             Intro. to Computer Science
+      2009
+
+Brown                Intro. to Computer Science
+      2009
+
+
+NAME                 TITLE
+-------------------- --------------------------------------------------
+      YEAR
+----------
+Bourikas             Intro. to Computer Science
+      2009
+
+Chavez               Investment Banking
+      2010
+
+Sanchez              Music Video Production
+      2010
+
+
+9 rows selected.
+
+SQL> select s.name, t.course_id, c.title as c_name from student s, takes t, course c WHERE s.ID=t.ID AND t.course_id=c.course_id AND t.year=2015;
+
+no rows selected
+
+SQL> select s.name, t.course_id, c.title as c_name from student s, takes t, course c WHERE s.ID=t.ID AND t.course_id=c.course_id AND t.year=2010;
+
+NAME                 COURSE_I C_NAME
+-------------------- -------- --------------------------------------------------
+Tanaka               BIO-301  Genetics
+Levy                 CS-101   Intro. to Computer Science
+Shankar              CS-315   Robotics
+Bourikas             CS-315   Robotics
+Levy                 CS-319   Image Processing
+Brown                CS-319   Image Processing
+Chavez               FIN-201  Investment Banking
+Brandt               HIS-351  World History
+Sanchez              MU-199   Music Video Production
+
+9 rows selected.
+
+SQL> select name, salary AS inst_salary from instructor where salary> ANY(select salary from instructor where dept_name='Comp. Sci.');
+
+NAME                 INST_SALARY
+-------------------- -----------
+Einstein                   95000
+Brandt                     92000
+Wu                         90000
+Gold                       87000
+Kim                        80000
+Singh                      80000
+Katz                       75000
+Crick                      72000
+
+8 rows selected.
+
+SQL> select name from instructor where dept_name LIKE '%ch%';
+
+no rows selected
+
+SQL> select name from instructor where dept_name LIKE '%h%';
+
+NAME
+--------------------
+Einstein
+Gold
+
+SQL> select name from instructor where dept_name LIKE '%H%';
+
+NAME
+--------------------
+El Said
+Califieri
+
+SQL> select name, length(name) as name_length from student;
+
+NAME                 NAME_LENGTH
+-------------------- -----------
+Zhang                          5
+Shankar                        7
+Brandt                         6
+Chavez                         6
+Peltier                        7
+Levy                           4
+Williams                       8
+Sanchez                        7
+Snow                           4
+Brown                          5
+Aoi                            3
+
+NAME                 NAME_LENGTH
+-------------------- -----------
+Bourikas                       8
+Tanaka                         6
+
+13 rows selected.
+
+SQL> select dept_name, substr(dept_name,3,3) from department;
+
+DEPT_NAME            SUBSTR(DEPT_
+-------------------- ------------
+Biology              olo
+Comp. Sci.           mp.
+Elec. Eng.           ec.
+Finance              nan
+History              sto
+Music                sic
+Physics              ysi
+
+7 rows selected.
+
+SQL> select upper(name) from instructor;
+
+UPPER(NAME)
+--------------------
+SRINIVASAN
+WU
+MOZART
+EINSTEIN
+EL SAID
+GOLD
+KATZ
+CALIFIERI
+SINGH
+CRICK
+BRANDT
+
+UPPER(NAME)
+--------------------
+KIM
+
+12 rows selected.
+
+SQL> select * from instructor;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+10101 Srinivasan           Comp. Sci.                65000
+12121 Wu                   Finance                   90000
+15151 Mozart               Music                     40000
+22222 Einstein             Physics                   95000
+32343 El Said              History                   60000
+33456 Gold                 Physics                   87000
+45565 Katz                 Comp. Sci.                75000
+58583 Califieri            History                   62000
+76543 Singh                Finance                   80000
+76766 Crick                Biology                   72000
+83821 Brandt               Comp. Sci.                92000
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+98345 Kim                  Elec. Eng.                80000
+
+12 rows selected.
+
+SQL> select name, NVL(salary,0) from instructor;
+
+NAME                 NVL(SALARY,0)
+-------------------- -------------
+Srinivasan                   65000
+Wu                           90000
+Mozart                       40000
+Einstein                     95000
+El Said                      60000
+Gold                         87000
+Katz                         75000
+Califieri                    62000
+Singh                        80000
+Crick                        72000
+Brandt                       92000
+
+NAME                 NVL(SALARY,0)
+-------------------- -------------
+Kim                          80000
+
+12 rows selected.
+
+SQL> update instructor salary is null where name='Wu';
+update instructor salary is null where name='Wu'
+                         *
+ERROR at line 1:
+ORA-00971: missing SET keyword
+
+
+SQL> update instructor set salary is null where name='Wu';
+update instructor set salary is null where name='Wu'
+                             *
+ERROR at line 1:
+ORA-00927: missing equal sign
+
+
+SQL> update instructor set salary=null where name='Wu';
+
+1 row updated.
+
+SQL> select * from instructor;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+10101 Srinivasan           Comp. Sci.                65000
+12121 Wu                   Finance
+15151 Mozart               Music                     40000
+22222 Einstein             Physics                   95000
+32343 El Said              History                   60000
+33456 Gold                 Physics                   87000
+45565 Katz                 Comp. Sci.                75000
+58583 Califieri            History                   62000
+76543 Singh                Finance                   80000
+76766 Crick                Biology                   72000
+83821 Brandt               Comp. Sci.                92000
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+98345 Kim                  Elec. Eng.                80000
+
+12 rows selected.
+
+SQL> select name, NVL(salary,0) from instructor;
+
+NAME                 NVL(SALARY,0)
+-------------------- -------------
+Srinivasan                   65000
+Wu                               0
+Mozart                       40000
+Einstein                     95000
+El Said                      60000
+Gold                         87000
+Katz                         75000
+Califieri                    62000
+Singh                        80000
+Crick                        72000
+Brandt                       92000
+
+NAME                 NVL(SALARY,0)
+-------------------- -------------
+Kim                          80000
+
+12 rows selected.
+
+SQL> select salary, round(salary/3, -2) from instructor;
+
+    SALARY ROUND(SALARY/3,-2)
+---------- ------------------
+     65000              21700
+
+     40000              13300
+     95000              31700
+     60000              20000
+     87000              29000
+     75000              25000
+     62000              20700
+     80000              26700
+     72000              24000
+     92000              30700
+
+    SALARY ROUND(SALARY/3,-2)
+---------- ------------------
+     80000              26700
+
+12 rows selected.
