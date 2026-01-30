@@ -1,0 +1,492 @@
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Jan 30 08:39:12 2026
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Enter user-name: itb39@orcl
+Enter password:
+Last Successful login time: Fri Jan 23 2026 08:49:36 +05:30
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> select * from instructor;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+10101 Srinivasan           Comp. Sci.                65000
+12121 Wu                   Finance                   90000
+15151 Mozart               Music                     40000
+22222 Einstein             Physics                   95000
+32343 El Said              History                   60000
+33456 Gold                 Physics                   87000
+45565 Katz                 Comp. Sci.                75000
+58583 Califieri            History                   62000
+76543 Singh                Finance                   80000
+76766 Crick                Biology                   72000
+83821 Brandt               Comp. Sci.                92000
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+98345 Kim                  Elec. Eng.                80000
+
+12 rows selected.
+
+SQL> select * from student;
+
+ID    NAME                 DEPT_NAME              TOT_CRED
+----- -------------------- -------------------- ----------
+00128 Zhang                Comp. Sci.                  102
+12345 Shankar              Comp. Sci.                   32
+19991 Brandt               History                      80
+23121 Chavez               Finance                     110
+44553 Peltier              Physics                      56
+45678 Levy                 Physics                      46
+54321 Williams             Comp. Sci.                   54
+55739 Sanchez              Music                        38
+70557 Snow                 Physics                       0
+76543 Brown                Comp. Sci.                   58
+76653 Aoi                  Elec. Eng.                   60
+
+ID    NAME                 DEPT_NAME              TOT_CRED
+----- -------------------- -------------------- ----------
+98765 Bourikas             Elec. Eng.                   98
+98988 Tanaka               Biology                     120
+
+13 rows selected.
+
+SQL> select * from takes;
+
+ID    COURSE_I SEC_ID   SEMEST       YEAR GR
+----- -------- -------- ------ ---------- --
+00128 CS-101   1        Fall         2009 A
+00128 CS-347   1        Fall         2009 A-
+12345 CS-101   1        Fall         2009 C
+12345 CS-190   2        Spring       2009 A
+12345 CS-315   1        Spring       2010 A
+12345 CS-347   1        Fall         2009 A
+19991 HIS-351  1        Spring       2010 B
+23121 FIN-201  1        Spring       2010 C+
+44553 PHY-101  1        Fall         2009 B-
+45678 CS-101   1        Fall         2009 F
+45678 CS-101   1        Spring       2010 B+
+
+ID    COURSE_I SEC_ID   SEMEST       YEAR GR
+----- -------- -------- ------ ---------- --
+45678 CS-319   1        Spring       2010 B
+54321 CS-101   1        Fall         2009 A-
+54321 CS-190   2        Spring       2009 B+
+55739 MU-199   1        Spring       2010 A-
+76543 CS-101   1        Fall         2009 A
+76543 CS-319   2        Spring       2010 A
+76653 EE-181   1        Spring       2009 C
+98765 CS-101   1        Fall         2009 C-
+98765 CS-315   1        Spring       2010 B
+98988 BIO-101  1        Summer       2009 A
+98988 BIO-301  1        Summer       2010
+
+22 rows selected.
+
+SQL> select course_id, count(ID) as no._of_students from takes group by course_id;
+select course_id, count(ID) as no._of_students from takes group by course_id
+                                 *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select course_id, count(ID) as no_of_students from takes group by course_id;
+
+COURSE_I NO_OF_STUDENTS
+-------- --------------
+FIN-201               1
+CS-190                2
+MU-199                1
+CS-101                7
+HIS-351               1
+CS-319                2
+CS-347                2
+PHY-101               1
+EE-181                1
+CS-315                2
+BIO-101               1
+
+COURSE_I NO_OF_STUDENTS
+-------- --------------
+BIO-301               1
+
+12 rows selected.
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)/count(distinct dept_name)>10;
+
+no rows selected
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)/count(distinct dept_name)>10;
+
+no rows selected
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)>10;
+
+no rows selected
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)/count(distinct dept_name)>5;
+
+no rows selected
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)>5;
+
+no rows selected
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)>2;
+
+DEPT_NAME             COUNT(ID)
+-------------------- ----------
+Comp. Sci.                    4
+Physics                       3
+
+SQL> select dept_name, count(ID) from student group by dept_name having count(ID)/count(distinct dept_name)>2;
+
+DEPT_NAME             COUNT(ID)
+-------------------- ----------
+Comp. Sci.                    4
+Physics                       3
+
+SQL> select dept_name, count(course_id) from course group by dept_name;
+
+DEPT_NAME            COUNT(COURSE_ID)
+-------------------- ----------------
+Comp. Sci.                          5
+Biology                             3
+History                             1
+Elec. Eng.                          1
+Finance                             1
+Music                               1
+Physics                             1
+
+7 rows selected.
+
+SQL> select dept_name, avg(salary) group by dept_name having avg(salary)>42000;
+select dept_name, avg(salary) group by dept_name having avg(salary)>42000
+                              *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select dept_name, avg(salary) from instructor group by dept_name having avg(salary)>42000;
+
+DEPT_NAME            AVG(SALARY)
+-------------------- -----------
+Comp. Sci.            77333.3333
+Biology                    72000
+History                    61000
+Finance                    85000
+Elec. Eng.                 80000
+Physics                    91000
+
+6 rows selected.
+
+SQL> select dept_name, avg(salary) from instructor group by dept_name;
+
+DEPT_NAME            AVG(SALARY)
+-------------------- -----------
+Comp. Sci.            77333.3333
+Biology                    72000
+History                    61000
+Finance                    85000
+Elec. Eng.                 80000
+Music                      40000
+Physics                    91000
+
+7 rows selected.
+
+SQL> select course_id, sec_id, count(ID) as enrollment from takes where semester='Spring' and year=200 group by sec_id, course_id;
+
+no rows selected
+
+SQL> select course_id, sec_id, count(ID) as enrollment from takes where semester='Spring' and year=2009 group by sec_id, course_id;
+
+COURSE_I SEC_ID   ENROLLMENT
+-------- -------- ----------
+EE-181   1                 1
+CS-190   2                 2
+
+SQL> select sec_id, count(ID) as enrollment from takes where semester='Spring' and year=2009 group by sec_id;
+
+SEC_ID   ENROLLMENT
+-------- ----------
+2                 2
+1                 1
+
+SQL> select distinct course_id from prereq ORDER BY course_id ASC;
+
+COURSE_I
+--------
+BIO-301
+BIO-399
+CS-190
+CS-315
+CS-319
+CS-347
+EE-181
+
+7 rows selected.
+
+SQL> select * from instructor order by salary DESC;
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+22222 Einstein             Physics                   95000
+83821 Brandt               Comp. Sci.                92000
+12121 Wu                   Finance                   90000
+33456 Gold                 Physics                   87000
+98345 Kim                  Elec. Eng.                80000
+76543 Singh                Finance                   80000
+45565 Katz                 Comp. Sci.                75000
+76766 Crick                Biology                   72000
+10101 Srinivasan           Comp. Sci.                65000
+58583 Califieri            History                   62000
+32343 El Said              History                   60000
+
+ID    NAME                 DEPT_NAME                SALARY
+----- -------------------- -------------------- ----------
+15151 Mozart               Music                     40000
+
+12 rows selected.
+
+SQL> select MAX(total_sal) from (select dept_name, SUM(salary) as total_sal from instructor group by dept_name);
+
+MAX(TOTAL_SAL)
+--------------
+        232000
+
+SQL> SELECT dept_name, AVG(salary) AS avg_salary
+  2  FROM instructor
+  3  GROUP BY dept_name
+  4  HAVING AVG(salary) > 42000;
+
+DEPT_NAME            AVG_SALARY
+-------------------- ----------
+Comp. Sci.           77333.3333
+Biology                   72000
+History                   61000
+Finance                   85000
+Elec. Eng.                80000
+Physics                   91000
+
+6 rows selected.
+
+SQL> SELECT course_id, sec_id
+  2  FROM takes
+  3  WHERE semester = 'Spring'
+  4    AND year = 2010
+  5  GROUP BY course_id, sec_id
+  6  HAVING COUNT(ID) = (
+  7      SELECT MAX(cnt)
+  8      FROM (
+  9          SELECT COUNT(ID) AS cnt
+ 10          FROM takes
+ 11          WHERE semester = 'Spring'
+ 12            AND year = 2010
+ 13          GROUP BY course_id, sec_id
+ 14      )
+ 15  );
+
+COURSE_I SEC_ID
+-------- --------
+CS-315   1
+
+SQL> SELECT i.name
+  2  FROM instructor i
+  3  WHERE NOT EXISTS (
+  4      SELECT s.ID
+  5      FROM student s
+  6      WHERE s.dept_name = 'CSE'
+  7      AND NOT EXISTS (
+  8          SELECT *
+  9          FROM teaches t, takes tk
+ 10          WHERE t.ID = i.ID
+ 11          AND t.course_id = tk.course_id
+ 12          AND t.sec_id = tk.sec_id
+ 13          AND t.semester = tk.semester
+ 14          AND t.year = tk.year
+ 15          AND tk.ID = s.ID
+ 16      )
+ 17  );
+
+NAME
+--------------------
+Srinivasan
+Wu
+Mozart
+Einstein
+El Said
+Gold
+Katz
+Califieri
+Singh
+Crick
+Brandt
+
+NAME
+--------------------
+Kim
+
+12 rows selected.
+
+SQL> SELECT dept_name, AVG(salary) AS avg_salary
+  2  FROM instructor
+  3  GROUP BY dept_name
+  4  HAVING AVG(salary) > 50000
+  5  AND COUNT(ID) > 5;
+
+no rows selected
+
+SQL> select dept_name, avg(salary) from instructor group by dept_name having avg(salary)>40000 and count(id)>1;
+
+DEPT_NAME            AVG(SALARY)
+-------------------- -----------
+Comp. Sci.            77333.3333
+History                    61000
+Finance                    85000
+Physics                    91000
+
+SQL> WITH MaxBudget AS (
+  2      SELECT MAX(budget) AS max_budget
+  3      FROM department
+  4  )
+  5  SELECT dept_name
+  6  FROM department, MaxBudget
+  7  WHERE department.budget = MaxBudget.max_budget;
+
+DEPT_NAME
+--------------------
+Finance
+
+SQL> WITH MaxBudget AS (
+  2      SELECT MAX(budget) AS max_budget
+  3      FROM department
+  4  )
+  5  SELECT dept_name
+  6  FROM department, MaxBudget
+  7  WHERE department.budget = MaxBudget.max_budget;
+
+DEPT_NAME
+--------------------
+Finance
+
+SQL> WITH DeptSalary AS (
+  2      SELECT dept_name, SUM(salary) AS total_salary
+  3      FROM instructor
+  4      GROUP BY dept_name
+  5  ),
+  6  AvgSalary AS (
+  7      SELECT AVG(total_salary) AS avg_total
+  8      FROM DeptSalary
+  9  )
+ 10  SELECT dept_name
+ 11  FROM DeptSalary, AvgSalary
+ 12  WHERE DeptSalary.total_salary > AvgSalary.avg_total;
+
+DEPT_NAME
+--------------------
+Physics
+Finance
+Comp. Sci.
+
+SQL> savepoint s1;
+
+Savepoint created.
+
+SQL> update student set dept_name='IT' where dept_name='Comp. Sci.'
+  2  ;
+update student set dept_name='IT' where dept_name='Comp. Sci.'
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.SYS_C0014934) violated - parent key not
+found
+
+
+SQL> update student set dept_name='IT' where dept_name='Comp. Sci.';
+update student set dept_name='IT' where dept_name='Comp. Sci.'
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.SYS_C0014934) violated - parent key not
+found
+
+
+ QL> update department set dept_name='IT' where dept_name='Comp. Sci.';
+update department set dept_name='IT' where dept_name='Comp. Sci.'
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (ITB39.SYS_C0014918) violated - child record
+found
+
+
+SQL> update student set dept_name='IT' where dept_name='Comp. Sci.';
+update student set dept_name='IT' where dept_name='Comp. Sci.'
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ITB39.SYS_C0014934) violated - parent key not
+found
+
+
+SQL> INSERT INTO department (dept_name, building, budget)
+  2  SELECT 'IT', building, budget
+  3  FROM department
+  4  WHERE dept_name = 'Comp. Sci.';
+
+1 row created.
+
+SQL> UPDATE student
+  2  SET dept_name = 'IT'
+  3  WHERE dept_name = 'Comp. Sci.';
+
+4 rows updated.
+
+SQL>
+SQL> UPDATE instructor
+  2  SET dept_name = 'IT'
+  3  WHERE dept_name = 'Comp. Sci.';
+
+3 rows updated.
+
+SQL>
+SQL> UPDATE course
+  2  SET dept_name = 'IT'
+  3  WHERE dept_name = 'Comp. Sci.';
+
+5 rows updated.
+
+SQL> DELETE FROM department
+  2  WHERE dept_name = 'Comp. Sci.';
+
+1 row deleted.
+
+SQL> ROLLBACK TO s1;
+
+Rollback complete.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> savepoint s2;
+
+Savepoint created.
+
+SQL> update instructor set salary=salary*1.03 where salary>100000;
+
+0 rows updated.
+
+SQL> update instructor set salary=salary*1.05 where salary<=100000;
+
+12 rows updated.
+
+SQL> rollback to s2;
+
+Rollback complete.
+
+SQL> commit;
+
+Commit complete.
