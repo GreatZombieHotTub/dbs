@@ -1,0 +1,625 @@
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Feb 17 14:16:06 2026
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Enter user-name: it12lab75@orcl
+Enter password:
+Last Successful login time: Tue Feb 03 2026 14:46:10 +05:30
+
+Connected to:
+Oracle Database 19c Standard Edition 2 Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> set serveroutput on
+SQL> declare
+  2  message varchar2(20):='Hello, World!'; begin
+  3  dbms_output.put_line(message);
+  4  end;/
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+SQL> declare message varchar2(20):='Hello, World!'; begin dbms_output.put_line(message); end;
+
+SQL> declare
+  2    message varchar2(20):='Hello, World!';
+  3  begin
+  4    dbms_output.put_line(message);
+  5  end;
+  6  /
+Hello, World!
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE grade CHAR(1); BEGIN grade := '&g'; IF grade = 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent'); ELSIF grade = 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good'); ELSIF grade = 'C' THEN
+  2  DBMS_OUTPUT.PUT_LINE('Good'); ELSIF grade = 'D' THEN DBMS_OUTPUT. PUT_LINE('Fair'); ELSIF grade = 'F' THEN DBMS_OUTPUT.PUT_LINE('Poor'); ELSE DBMS_OUTPUT.PUT_LINE('No such grade'); END IF; END;
+  3  /
+Enter value for g: C
+old   1: DECLARE grade CHAR(1); BEGIN grade := '&g'; IF grade = 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent'); ELSIF grade = 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good'); ELSIF grade = 'C' THEN
+new   1: DECLARE grade CHAR(1); BEGIN grade := 'C'; IF grade = 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent'); ELSIF grade = 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good'); ELSIF grade = 'C' THEN
+Good
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2  grade char(1);
+  3  begin
+  4  grade:='&g';
+  5  if grade='A' then
+  6  dbms_output.put_line('excellent');
+  7  else
+  8  dbms_output.put_line('haha fail');
+  9  end if;
+ 10  end;
+ 11  /
+Enter value for g: A
+old   4: grade:='&g';
+new   4: grade:='A';
+excellent
+
+PL/SQL procedure successfully completed.
+
+SQL> declare
+  2  x number:=0;
+  3  begin
+  4  loop
+  5  dbms_output.put_line('inside loop: x= ' || to_char(x));
+  6  x:=x+1;
+  7  if x>3 then exit;
+  8  end if;
+  9  end loop;
+ 10  dbms_output.put_line('after loop loop: x= ' || to_char(x));
+ 11  end;
+ 12  /
+inside loop: x= 0
+inside loop: x= 1
+inside loop: x= 2
+inside loop: x= 3
+after loop loop: x= 4
+
+PL/SQL procedure successfully completed.
+
+SQL> create table student(rollno number primary key, gpa number(3,1));
+create table student(rollno number primary key, gpa number(3,1))
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object
+
+
+SQL> create table StudentTable(rollno number primary key, gpa number(3,1));
+
+Table created.
+
+SQL> declare
+  2  rno StudentTable.rolno%type;
+  3  gpa StudentTable/
+  4  /
+gpa StudentTable/
+                *
+ERROR at line 3:
+ORA-06550: line 3, column 17:
+PLS-00103: Encountered the symbol "/" when expecting one of the following:
+:= . ( @ % ; not null range default character
+
+
+SQL> declare
+  2  rno StudentTable.rollno%type;
+  3  gpa StudentTable.gpa%type;
+  4  begin
+  5  rno:=&r;
+  6  select gpa from StudentTable where rollno=rno;
+  7  dbms_output.put_line('gpa= ' || gpa);
+  8  exception
+  9  when NO_DATA_FOUND then
+ 10  dbms_output.put_line('student not found');
+ 11  end;
+ 12  /
+Enter value for r: 1
+old   5: rno:=&r;
+new   5: rno:=1;
+select gpa from StudentTable where rollno=rno;
+*
+ERROR at line 6:
+ORA-06550: line 6, column 1:
+PLS-00428: an INTO clause is expected in this SELECT statement
+
+
+SQL> insert into StudentTable values (1, 5.8);
+
+1 row created.
+
+SQL> insert into StudentTable values (2, 6.5);
+
+1 row created.
+
+SQL> insert into StudentTable values (3, 3.4);
+
+1 row created.
+
+SQL> insert into StudentTable values (4, 7.8);
+
+1 row created.
+
+SQL> insert into StudentTable values (5, 9.5);
+
+1 row created.
+
+SQL> declare
+  2  rno StudentTable.rolno%type;
+  3  gpa StudentTable.gpa%type;
+  4  begin
+  5  rno StudentTable.rolno%type;/
+  6  /
+rno StudentTable.rolno%type;/
+    *
+ERROR at line 5:
+ORA-06550: line 5, column 5:
+PLS-00103: Encountered the symbol "STUDENTTABLE" when expecting one of the
+following:
+:= . ( @ % ;
+The symbol ":=" was substituted for "STUDENTTABLE" to continue.
+ORA-06550: line 5, column 29:
+PLS-00103: Encountered the symbol "/" when expecting one of the following:
+( begin case declare end exception exit for goto if loop mod
+null pragma raise return select update while with
+<an identifier> <a double-quoted delimited-identifier>
+<a bind variable> << continue close current delete fetch lock
+insert open rollback savepoint set sql execute commit forall
+merge pipe purge json_exists json_value json_query
+json_object json_array
+
+
+SQL> SQL> declare
+SP2-0734: unknown command beginning "SQL> decla..." - rest of line ignored.
+SQL>   2  rno StudentTable.rollno%type;
+SQL>   3  gpa StudentTable.gpa%type;
+SQL>   4  begin
+SQL>   5  rno:=&r;
+SQL>   6  select gpa from StudentTable where rollno=rno;
+SQL>   7  dbms_output.put_line('gpa= ' || gpa);
+SQL>   8  exception
+SQL>   9  when NO_DATA_FOUND then
+SQL>  10  dbms_output.put_line('student not found');
+SQL>  11  end;
+SQL>  12  /
+SQL>
+SQL> /
+Enter value for r: 5
+old   5:  rno:=&r
+new   5:  rno:=5
+ gpa StudentTable.gpa%type
+ *
+ERROR at line 3:
+ORA-06550: line 3, column 2:
+PLS-00103: Encountered the symbol "GPA" when expecting one of the following:
+:= ( ; not null range default character
+The symbol ";" was substituted for "GPA" to continue.
+ORA-06550: line 4, column 2:
+PLS-00103: Encountered the symbol "BEGIN" when expecting one of the following:
+:= ( ; not null range default character
+The symbol ";" was substituted for "BEGIN" to continue.
+ORA-06550: line 6, column 2:
+PLS-00103: Encountered the symbol "SELECT" when expecting one of the following:
+* & = - + ; < / > at in is mod remainder not rem
+<an exponent (**)> <> or != or ~= >= <= <> and or like like2
+like4 likec between || multiset member submultiset
+The symbol ";" was substituted for "SELECT" to continue.
+ORA-06550: line 7, column 2:
+PLS-00103: Encountered the symbol "DBMS_OUTPUT" when expecting one of the
+following:
+. ( * @ % & - + ; / at for mod remainder rem
+<an exponent (**)> and or group having intersect minus order
+start union where connect || multiset
+The symbol "." was substituted for "DBMS_OUTPUT" to continue.
+ORA-06550: line 8, column 2:
+PLS-00103: Encountered the symbol "EXCEPTION" when expecting one of the
+following:
+. ( * % & - + ; / at for mod remainder rem <an exponent (**)>
+and or group having intersect minus order start union where
+connect || multiset
+The symbol ";" was substituted for "EXCEPTION" to continue.
+ORA-06550: line 11, column 2:
+PLS-00103: Encountered the symbol "END" when expecting one of the following:
+:= . ( % ;
+
+
+SQL> declare
+  2    rno StudentTable.rollno%type;
+  3   gpa StudentTable.gpa%type;
+  4   begin
+  5   rno:=&r;
+  6  select gpa from StudentTable where rollno=rno;
+  7  dbms_output.put_line('gpa= ' || gpa);
+  8  exception
+  9   when NO_DATA_FOUND then
+ 10  dbms_output.put_line('student not found');
+ 11  end;
+ 12   /
+Enter value for r: 5
+old   5:  rno:=&r;
+new   5:  rno:=5;
+select gpa from StudentTable where rollno=rno;
+*
+ERROR at line 6:
+ORA-06550: line 6, column 1:
+PLS-00428: an INTO clause is expected in this SELECT statement
+
+
+SQL> declare
+  2    rno StudentTable.rollno%type;
+  3   gpa StudentTable.gpa%type;
+  4   begin
+  5   rno:=&r;
+  6  select gpa into gpa from StudentTable where rollno=rno;
+  7  dbms_output.put_line('gpa= ' || gpa);
+  8  exception
+  9   when NO_DATA_FOUND then
+ 10  dbms_output.put_line('student not found');
+ 11  end;
+ 12   /
+Enter value for r: 5
+old   5:  rno:=&r;
+new   5:  rno:=5;
+gpa= 9.5
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      rno StudentTable.rollno%TYPE;
+  3      gpa StudentTable.gpa%TYPE;
+  4      grade VARCHAR2(2);
+  5  BEGIN
+  6      rno := &r;
+  7      SELECT gpa INTO gpa FROM StudentTable WHERE rollno = rno;
+  8
+  9      IF gpa < 4 THEN grade := 'F';
+ 10      ELSIF gpa < 5 THEN grade := 'E';
+ 11      ELSIF gpa < 6 THEN grade := 'D';
+ 12      ELSIF gpa < 7 THEN grade := 'C';
+ 13      ELSIF gpa < 8 THEN grade := 'B';
+ 14      ELSIF gpa < 9 THEN grade := 'A';
+ 15      ELSE grade := 'A+';
+ 16      END IF;
+ 17
+ 18      DBMS_OUTPUT.PUT_LINE('Grade = ' || grade);
+ 19  END;
+ 20  /
+Enter value for r: 8.5
+old   6:     rno := &r;
+new   6:     rno := 8.5;
+DECLARE
+*
+ERROR at line 1:
+ORA-01403: no data found
+ORA-06512: at line 7
+
+
+SQL> DECLARE
+  2      rno StudentTable.rollno%TYPE;
+  3      gpa StudentTable.gpa%TYPE;
+  4      grade VARCHAR2(2);
+  5  BEGIN
+  6      rno := &r;
+  7      SELECT gpa INTO gpa FROM StudentTable WHERE rollno = rno;
+  8
+  9      IF gpa < 4 THEN grade := 'F';
+ 10      ELSIF gpa < 5 THEN grade := 'E';
+ 11      ELSIF gpa < 6 THEN grade := 'D';
+ 12      ELSIF gpa < 7 THEN grade := 'C';
+ 13      ELSIF gpa < 8 THEN grade := 'B';
+ 14      ELSIF gpa < 9 THEN grade := 'A';
+ 15      ELSE grade := 'A+';
+ 16      END IF;
+ 17
+ 18      DBMS_OUTPUT.PUT_LINE('Grade = ' || grade);
+ 19  END;
+ 20  /
+Enter value for r: 4
+old   6:     rno := &r;
+new   6:     rno := 4;
+Grade = B
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      issue_date DATE := TO_DATE('&issue','DD-MM-YYYY');
+  3      return_date DATE := TO_DATE('&return','DD-MM-YYYY');
+  4      days NUMBER;
+  5      fine NUMBER := 0;
+  6  BEGIN
+  7      days := return_date - issue_date;
+  8
+  9      IF days <= 7 THEN
+ 10          fine := 0;
+ 11      ELSIF days <= 15 THEN
+ 12          fine := (days-7) * 1;
+ 13      ELSIF days <= 30 THEN
+ 14          fine := (days-15) * 2 + 8;
+ 15      ELSE
+ 16          fine := 5;
+ 17      END IF;
+ 18
+ 19      DBMS_OUTPUT.PUT_LINE('Fine = Rs.' || fine);
+ 20  END;
+ 21  /
+Enter value for issue: 01-01-2025
+old   2:     issue_date DATE := TO_DATE('&issue','DD-MM-YYYY');
+new   2:     issue_date DATE := TO_DATE('01-01-2025','DD-MM-YYYY');
+Enter value for return: 10-02-2025
+old   3:     return_date DATE := TO_DATE('&return','DD-MM-YYYY');
+new   3:     return_date DATE := TO_DATE('10-02-2025','DD-MM-YYYY');
+Fine = Rs.5
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      issue_date DATE := TO_DATE('&issue','DD-MM-YYYY');
+  3      return_date DATE := TO_DATE('&return','DD-MM-YYYY');
+  4      days NUMBER;
+  5      fine NUMBER := 0;
+  6  BEGIN
+  7      days := return_date - issue_date;
+  8
+  9      IF days <= 7 THEN
+ 10          fine := 0;
+ 11      ELSIF days <= 15 THEN
+ 12          -- Rs. 1 per day for days 8 to 15
+ 13          fine := (days - 7) * 1;
+ 14      ELSIF days <= 30 THEN
+ 15          -- Rs. 8 (accumulated) + Rs. 2 per day for days 16 to 30
+ 16          fine := (days - 15) * 2 + 8;
+ 17      ELSE
+ 18          -- Rs. 38 (accumulated) + Rs. 5 per day for days 31+
+ 19          fine := (days - 30) * 5 + 38;
+ 20      END IF;
+ 21
+ 22      DBMS_OUTPUT.PUT_LINE('Total Days: ' || days);
+ 23      DBMS_OUTPUT.PUT_LINE('Fine = Rs.' || fine);
+ 24  END;
+ 25  /
+Enter value for issue: 01-01-2025
+old   2:     issue_date DATE := TO_DATE('&issue','DD-MM-YYYY');
+new   2:     issue_date DATE := TO_DATE('01-01-2025','DD-MM-YYYY');
+Enter value for return: 10-02-2025
+old   3:     return_date DATE := TO_DATE('&return','DD-MM-YYYY');
+new   3:     return_date DATE := TO_DATE('10-02-2025','DD-MM-YYYY');
+Total Days: 40
+Fine = Rs.88
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      rno NUMBER := 1;
+  3      gpa NUMBER;
+  4      grade VARCHAR2(2);
+  5  BEGIN
+  6      LOOP
+  7          SELECT gpa INTO gpa FROM StudentTable WHERE rollno = rno;
+  8
+  9          IF gpa < 4 THEN grade := 'F';
+ 10          ELSIF gpa < 5 THEN grade := 'E';
+ 11          ELSIF gpa < 6 THEN grade := 'D';
+ 12          ELSIF gpa < 7 THEN grade := 'C';
+ 13          ELSIF gpa < 8 THEN grade := 'B';
+ 14          ELSIF gpa < 9 THEN grade := 'A';
+ 15          ELSE grade := 'A+';
+ 16          END IF;
+ 17
+ 18          DBMS_OUTPUT.PUT_LINE('RollNo: ' || rno || ' Grade: ' || grade);
+ 19
+ 20          rno := rno + 1;
+ 21          EXIT WHEN rno > 5;
+ 22      END LOOP;
+ 23  END;
+ 24  /
+RollNo: 1 Grade: D
+RollNo: 2 Grade: C
+RollNo: 3 Grade: F
+RollNo: 4 Grade: B
+RollNo: 5 Grade: A+
+
+PL/SQL procedure successfully completed.
+
+SQL> ALTER TABLE StudentTable ADD LetterGrade VARCHAR2(2);
+
+Table altered.
+
+SQL> DECLARE
+  2      rno NUMBER := 1;
+  3      gpa NUMBER;
+  4      grade VARCHAR2(2);
+  5  BEGIN
+  6      WHILE rno <= 5 LOOP
+  7          SELECT gpa INTO gpa FROM StudentTable WHERE rollno = rno;
+  8
+  9          IF gpa < 4 THEN grade := 'F';
+ 10          ELSIF gpa < 5 THEN grade := 'E';
+ 11          ELSIF gpa < 6 THEN grade := 'D';
+ 12          ELSIF gpa < 7 THEN grade := 'C';
+ 13          ELSIF gpa < 8 THEN grade := 'B';
+ 14          ELSIF gpa < 9 THEN grade := 'A';
+ 15          ELSE grade := 'A+';
+ 16          END IF;
+ 17
+ 18          UPDATE StudentTable SET LetterGrade = grade WHERE rollno = rno;
+ 19
+ 20          rno := rno + 1;
+ 21      END LOOP;
+ 22  END;
+ 23  /
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from StudentTable;
+
+    ROLLNO        GPA LE
+---------- ---------- --
+         1        5.8 D
+         2        6.5 C
+         3        3.4 F
+         4        7.8 B
+         5        9.5 A+
+
+SQL> DECLARE
+  2      max_gpa NUMBER := 0;
+  3      max_rno NUMBER;
+  4      temp NUMBER;
+  5  BEGIN
+  6      FOR i IN 1..5 LOOP
+  7          SELECT gpa INTO temp FROM StudentTable WHERE rollno = i;
+  8
+  9          IF temp > max_gpa THEN
+ 10              max_gpa := temp;
+ 11              max_rno := i;
+ 12          END IF;
+ 13      END LOOP;
+ 14
+ 15      DBMS_OUTPUT.PUT_LINE('Top Student RollNo: ' || max_rno);
+ 16      DBMS_OUTPUT.PUT_LINE('Max GPA: ' || max_gpa);
+ 17  END;
+ 18  /
+Top Student RollNo: 5
+Max GPA: 9.5
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      rno NUMBER := 1;
+  3      gpa NUMBER;
+  4      grade VARCHAR2(2);
+  5  BEGIN
+  6      -- Define the start label for our jump
+  7      <<start_loop>>
+  8
+  9      SELECT gpa INTO gpa FROM StudentTable WHERE rollno = rno;
+ 10
+ 11      IF gpa < 4 THEN grade := 'F';
+ 12      ELSIF gpa < 5 THEN grade := 'E';
+ 13      ELSIF gpa < 6 THEN grade := 'D';
+ 14      ELSIF gpa < 7 THEN grade := 'C';
+ 15      ELSIF gpa < 8 THEN grade := 'B';
+ 16      ELSIF gpa < 9 THEN grade := 'A';
+ 17      ELSE grade := 'A+';
+ 18      END IF;
+ 19
+ 20      DBMS_OUTPUT.PUT_LINE('RollNo: ' || rno || ' Grade: ' || grade);
+ 21
+ 22      rno := rno + 1;
+ 23
+ 24      -- Conditional check to jump back to the start
+ 25      IF rno <= 5 THEN
+ 26          GOTO start_loop;
+ 27      END IF;
+ 28
+ 29  END;
+ 30  /
+RollNo: 1 Grade: D
+RollNo: 2 Grade: C
+RollNo: 3 Grade: F
+RollNo: 4 Grade: B
+RollNo: 5 Grade: A+
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      yr NUMBER := &year;
+  3  BEGIN
+  4      IF (MOD(yr,400)=0) OR (MOD(yr,4)=0 AND MOD(yr,100)!=0) THEN
+  5          DBMS_OUTPUT.PUT_LINE('Leap Year');
+  6      ELSE
+  7          DBMS_OUTPUT.PUT_LINE('Not a Leap Year');
+  8      END IF;
+  9  END;
+ 10  /
+Enter value for year: 2006
+old   2:     yr NUMBER := &year;
+new   2:     yr NUMBER := 2006;
+Not a Leap Year
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      yr NUMBER := &year;
+  3  BEGIN
+  4      IF (MOD(yr,400)=0) OR (MOD(yr,4)=0 AND MOD(yr,100)!=0) THEN
+  5          DBMS_OUTPUT.PUT_LINE('Leap Year');
+  6      ELSE
+  7          DBMS_OUTPUT.PUT_LINE('Not a Leap Year');
+  8      END IF;
+  9  END;
+ 10  /
+Enter value for year: 2024
+old   2:     yr NUMBER := &year;
+new   2:     yr NUMBER := 2024;
+Leap Year
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      str VARCHAR2(20) := '&string';
+  3      rev VARCHAR2(20) := '';
+  4      i NUMBER;
+  5  BEGIN
+  6      i := LENGTH(str);
+  7
+  8      WHILE i > 0 LOOP
+  9          rev := rev || SUBSTR(str,i,1);
+ 10          i := i - 1;
+ 11      END LOOP;
+ 12
+ 13      DBMS_OUTPUT.PUT_LINE('Reversed: ' || rev);
+ 14  END;
+ 15  /
+Enter value for string: 9635
+old   2:     str VARCHAR2(20) := '&string';
+new   2:     str VARCHAR2(20) := '9635';
+Reversed: 5369
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      n1 NUMBER := &n1;
+  3      n2 NUMBER := &n2;
+  4      op CHAR(1) := '&op';
+  5      invalid_operator EXCEPTION;
+  6      result NUMBER;
+  7  BEGIN
+  8      IF op = '+' THEN
+  9          result := n1 + n2;
+ 10      ELSIF op = '-' THEN
+ 11          result := n1 - n2;
+ 12      ELSIF op = '*' THEN
+ 13          result := n1 * n2;
+ 14      ELSIF op = '/' THEN
+ 15          result := n1 / n2;
+ 16      ELSE
+ 17          RAISE invalid_operator;
+ 18      END IF;
+ 19
+ 20      DBMS_OUTPUT.PUT_LINE('Result = ' || result);
+ 21
+ 22  EXCEPTION
+ 23      WHEN invalid_operator THEN
+ 24          DBMS_OUTPUT.PUT_LINE('Invalid Operator');
+ 25      WHEN ZERO_DIVIDE THEN
+ 26          DBMS_OUTPUT.PUT_LINE('Cannot divide by zero');
+ 27  END;
+ 28  /
+Enter value for n1: 57
+old   2:     n1 NUMBER := &n1;
+new   2:     n1 NUMBER := 57;
+Enter value for n2: 9
+old   3:     n2 NUMBER := &n2;
+new   3:     n2 NUMBER := 9;
+Enter value for op: /
+old   4:     op CHAR(1) := '&op';
+new   4:     op CHAR(1) := '/';
+Result = 6.33333333333333333333333333333333333333
+
+PL/SQL procedure successfully completed.
