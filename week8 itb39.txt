@@ -1,0 +1,354 @@
+SQL> -- Step 1: Ensure the log table exists
+SQL> CREATE TABLE salary_raise (
+  2      Instructor_Id varchar(5),
+  3      Raise_date date,
+  4      Raise_amt numeric(8,2)
+  5  );
+
+Table created.
+
+SQL>
+SQL> -- Step 2: Your corrected block
+SQL> DECLARE
+  2      CURSOR c1 IS
+  3          SELECT id, salary
+  4          FROM instructor
+  5          WHERE dept_name = 'Comp. Sci.'
+  6          FOR UPDATE;
+  7
+  8      -- YOU NEED THESE DECLARED:
+  9      v_id instructor.id%TYPE;
+ 10      v_salary instructor.salary%TYPE;
+ 11      v_raise_amt instructor.salary%TYPE;
+ 12  BEGIN
+ 13      OPEN c1;
+ 14
+ 15      LOOP
+ 16          FETCH c1 INTO v_id, v_salary;
+ 17          EXIT WHEN c1%NOTFOUND;
+ 18
+ 19          v_raise_amt := v_salary * 0.05;
+ 20
+ 21          -- Update the specific row the cursor is currently pointing to
+ 22          UPDATE instructor
+ 23          SET salary = salary + v_raise_amt
+ 24          WHERE CURRENT OF c1;
+ 25
+ 26          -- Insert into the log
+ 27          INSERT INTO salary_raise
+ 28          VALUES (v_id, SYSDATE, v_raise_amt);
+ 29
+ 30      END LOOP;
+ 31
+ 32      CLOSE c1;
+ 33      COMMIT;
+ 34
+ 35      DBMS_OUTPUT.PUT_LINE('Salary raise and logging completed successfully.');
+ 36  END;
+ 37  /
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      -- 1. Define the cursor
+  3      CURSOR c1 IS
+  4          SELECT id, name, dept_name, tot_cred
+  5          FROM student
+  6          ORDER BY tot_cred ASC;
+  7
+  8      -- 2. Variables MUST be declared to hold the FETCHED data
+  9      v_id     student.id%TYPE;
+ 10      v_name   student.name%TYPE;
+ 11      v_dept   student.dept_name%TYPE;
+ 12      v_cred   student.tot_cred%TYPE;
+ 13      v_count  NUMBER := 0;
+ 14  BEGIN
+ 15      OPEN c1;
+ 16
+ 17      LOOP
+ 18          FETCH c1 INTO v_id, v_name, v_dept, v_cred;
+ 19
+ 20          -- Your logic: Stop if no more data OR if we reached 10 students
+ 21          EXIT WHEN c1%NOTFOUND OR v_count = 10;
+ 22
+ 23          DBMS_OUTPUT.PUT_LINE(
+ 24              v_id || ' ' || v_name || ' ' || v_dept || ' ' || v_cred);
+ 25
+ 26          v_count := v_count + 1;
+ 27      END LOOP;
+ 28
+ 29      CLOSE c1;
+ 30  END;
+ 31  /
+
+PL/SQL procedure successfully completed.
+
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL> DECLARE
+  2  BEGIN
+  3      FOR rec IN (
+  4          SELECT c.course_id, c.title, c.dept_name, c.credits,
+  5                 i.name AS instructor_name,
+  6                 s.building, s.room_number, s.time_slot_id,
+  7                 COUNT(t.ID) AS tot_student_no
+  8          FROM course c
+  9          JOIN section s ON c.course_id = s.course_id
+ 10          JOIN teaches te ON s.course_id = te.course_id
+ 11                          AND s.sec_id = te.sec_id
+ 12                          AND s.semester = te.semester
+ 13                          AND s.year = te.year
+ 14          JOIN instructor i ON te.ID = i.ID
+ 15          LEFT JOIN takes t ON s.course_id = t.course_id
+ 16                           AND s.sec_id = t.sec_id
+ 17                           AND s.semester = t.semester
+ 18                           AND s.year = t.year
+ 19          GROUP BY c.course_id, c.title, c.dept_name, c.credits,
+ 20                   i.name, s.building, s.room_number, s.time_slot_id
+ 21      )
+ 22      LOOP
+ 23          DBMS_OUTPUT.PUT_LINE(
+ 24              'Course: ' || rec.course_id || ' | Title: ' || rec.title);
+ 25          DBMS_OUTPUT.PUT_LINE(
+ 26              'Instructor: ' || rec.instructor_name || ' | Students: ' || rec.tot_student_no);
+ 27          DBMS_OUTPUT.PUT_LINE('--------------------------------------------------');
+ 28      END LOOP;
+ 29  END;
+ 30  /
+Course: HIS-351 | Title: World History
+Instructor: El Said | Students: 1
+--------------------------------------------------
+Course: CS-101 | Title: Intro. to Computer Science
+Instructor: Srinivasan | Students: 6
+--------------------------------------------------
+Course: PHY-101 | Title: Physical Principles
+Instructor: Einstein | Students: 1
+--------------------------------------------------
+Course: BIO-301 | Title: Genetics
+Instructor: Crick | Students: 1
+--------------------------------------------------
+Course: CS-347 | Title: Database System Concepts
+Instructor: Srinivasan | Students: 2
+--------------------------------------------------
+Course: FIN-201 | Title: Investment Banking
+Instructor: Wu | Students: 1
+--------------------------------------------------
+Course: CS-319 | Title: Image Processing
+Instructor: Katz | Students: 1
+--------------------------------------------------
+Course: CS-319 | Title: Image Processing
+Instructor: Brandt | Students: 1
+--------------------------------------------------
+Course: BIO-101 | Title: Intro. to Biology
+Instructor: Crick | Students: 1
+--------------------------------------------------
+Course: MU-199 | Title: Music Video Production
+Instructor: Mozart | Students: 1
+--------------------------------------------------
+Course: CS-190 | Title: Game Design
+Instructor: Brandt | Students: 2
+--------------------------------------------------
+Course: CS-315 | Title: Robotics
+Instructor: Srinivasan | Students: 2
+--------------------------------------------------
+Course: CS-101 | Title: Intro. to Computer Science
+Instructor: Katz | Students: 1
+--------------------------------------------------
+Course: EE-181 | Title: Intro. to Digital Systems
+Instructor: Kim | Students: 1
+--------------------------------------------------
+Course: CS-190 | Title: Game Design
+Instructor: Brandt | Students: 0
+--------------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+SQL> BEGIN
+  2      FOR rec IN (
+  3          SELECT t.id, t.course_id, t.sec_id, t.semester, t.year
+  4          FROM student s
+  5          JOIN takes t ON s.id = t.id
+  6          WHERE t.course_id = 'CS-101'  -- Adjusted to match your 'CS-101' data
+  7          AND s.tot_cred < 30
+  8      )
+  9      LOOP
+ 10          -- It is best to delete using all primary key parts to be precise
+ 11          DELETE FROM takes
+ 12          WHERE id = rec.id
+ 13          AND course_id = rec.course_id
+ 14          AND sec_id = rec.sec_id
+ 15          AND semester = rec.semester
+ 16          AND year = rec.year;
+ 17
+ 18          DBMS_OUTPUT.PUT_LINE('Deregistered Student ID: ' || rec.id || ' from CS-101');
+ 19      END LOOP;
+ 20
+ 21      COMMIT;
+ 22  END;
+ 23  /
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from LetterGrade
+  2  ;
+select * from LetterGrade
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select * from LetterGrade;
+select * from LetterGrade
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> CREATE TABLE StudentTable (
+  2      rollno NUMBER PRIMARY KEY,
+  3      gpa NUMBER(3,1),
+  4      lettergrade VARCHAR2(2)
+  5  );
+
+Table created.
+
+SQL>
+SQL> INSERT INTO StudentTable (rollno, gpa) VALUES (1, 5.8);
+
+1 row created.
+
+SQL> INSERT INTO StudentTable (rollno, gpa) VALUES (2, 6.5);
+
+1 row created.
+
+SQL> INSERT INTO StudentTable (rollno, gpa) VALUES (3, 3.4);
+
+1 row created.
+
+SQL> INSERT INTO StudentTable (rollno, gpa) VALUES (4, 7.8);
+
+1 row created.
+
+SQL> INSERT INTO StudentTable (rollno, gpa) VALUES (5, 9.5);
+
+1 row created.
+
+SQL>
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> select * from StudentTable;
+
+    ROLLNO        GPA LE
+---------- ---------- --
+         1        5.8
+         2        6.5
+         3        3.4
+         4        7.8
+         5        9.5
+
+SQL> DECLARE
+  2      -- Use an explicit cursor for the FOR UPDATE clause
+  3      CURSOR c1 IS
+  4          SELECT rollno, gpa
+  5          FROM StudentTable
+  6          FOR UPDATE;
+  7  BEGIN
+  8      FOR rec IN c1
+  9      LOOP
+ 10          IF rec.gpa >= 9 THEN
+ 11              UPDATE StudentTable SET lettergrade = 'A'
+ 12              WHERE CURRENT OF c1;
+ 13          ELSIF rec.gpa >= 8 THEN
+ 14              UPDATE StudentTable SET lettergrade = 'B'
+ 15              WHERE CURRENT OF c1;
+ 16          ELSIF rec.gpa >= 7 THEN
+ 17              UPDATE StudentTable SET lettergrade = 'C'
+ 18              WHERE CURRENT OF c1;
+ 19          ELSE
+ 20              UPDATE StudentTable SET lettergrade = 'F'
+ 21              WHERE CURRENT OF c1;
+ 22          END IF;
+ 23      END LOOP;
+ 24
+ 25      COMMIT;
+ 26      DBMS_OUTPUT.PUT_LINE('StudentTable grades updated successfully.');
+ 27  END;
+ 28  /
+StudentTable grades updated successfully.
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT * FROM StudentTable;
+
+    ROLLNO        GPA LE
+---------- ---------- --
+         1        5.8 F
+         2        6.5 F
+         3        3.4 F
+         4        7.8 C
+         5        9.5 A
+
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL> DECLARE
+  2      -- Defining the parameter p_course_id
+  3      CURSOR c_course (p_course_id course.course_id%TYPE) IS
+  4          SELECT DISTINCT i.id, i.name
+  5          FROM instructor i
+  6          JOIN teaches t ON i.id = t.id
+  7          WHERE t.course_id = p_course_id;
+  8  BEGIN
+  9      -- Passing 'CS-101' as the actual parameter
+ 10      DBMS_OUTPUT.PUT_LINE('Instructors for CS-101:');
+ 11      DBMS_OUTPUT.PUT_LINE('-----------------------');
+ 12
+ 13      FOR rec IN c_course('CS-101')
+ 14      LOOP
+ 15          DBMS_OUTPUT.PUT_LINE('ID: ' || rec.id || ' | Name: ' || rec.name);
+ 16      END LOOP;
+ 17  END;
+ 18  /
+Instructors for CS-101:
+-----------------------
+ID: 10101 | Name: Srinivasan
+ID: 45565 | Name: Katz
+
+PL/SQL procedure successfully completed.
+
+SQL> DECLARE
+  2      -- Using the teaches table (te) to link instructor to the student's course
+  3      CURSOR c1 IS
+  4          SELECT DISTINCT s.id, s.name, t.course_id
+  5          FROM student s
+  6          JOIN advisor a  ON s.id = a.s_id
+  7          JOIN takes t    ON s.id = t.id
+  8          JOIN teaches te ON t.course_id = te.course_id
+  9                          AND t.sec_id = te.sec_id
+ 10                          AND t.semester = te.semester
+ 11                          AND t.year = te.year
+ 12          WHERE a.i_id = te.id; -- Checks if the teacher IS the advisor
+ 13  BEGIN
+ 14      DBMS_OUTPUT.PUT_LINE('Students taking a course taught by their Advisor:');
+ 15      DBMS_OUTPUT.PUT_LINE('--------------------------------------------------');
+ 16
+ 17      FOR rec IN c1
+ 18      LOOP
+ 19          DBMS_OUTPUT.PUT_LINE('ID: ' || rec.id || ' | Name: ' || rec.name || ' | Course: ' || rec.course_id);
+ 20      END LOOP;
+ 21  END;
+ 22  /
+Students taking a course taught by their Advisor:
+--------------------------------------------------
+ID: 12345 | Name: Shankar | Course: CS-347
+ID: 98988 | Name: Tanaka | Course: BIO-101
+ID: 98988 | Name: Tanaka | Course: BIO-301
+ID: 44553 | Name: Peltier | Course: PHY-101
+ID: 12345 | Name: Shankar | Course: CS-101
+ID: 76653 | Name: Aoi | Course: EE-181
+ID: 12345 | Name: Shankar | Course: CS-315
+
+PL/SQL procedure successfully completed.
+
+SQL>
