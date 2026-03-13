@@ -1,0 +1,320 @@
+SQL> --LAB 8
+SQL> --Q1
+SQL> CREATE TABLE salary_raise(
+  2      instructor_id VARCHAR2(5),
+  3      raise_date DATE,
+  4      raise_amt NUMBER
+  5  );
+CREATE TABLE salary_raise(
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object
+
+
+SQL> CREATE TABLE salary_raise_lab8 (
+  2      instructor_id VARCHAR2(5),
+  3      raise_date DATE,
+  4      raise_amt NUMBER
+  5  );
+
+Table created.
+
+SQL> DECLARE
+  2      CURSOR cur_raise IS
+  3          SELECT id, salary
+  4          FROM instructor
+  5          WHERE dept_name = 'Comp. Sci.'
+  6          FOR UPDATE;
+  7
+  8      v_id instructor.id%TYPE;
+  9      v_salary instructor.salary%TYPE;
+ 10      v_raise NUMBER;
+ 11
+ 12  BEGIN
+ 13      OPEN cur_raise;
+ 14
+ 15      LOOP
+ 16          FETCH cur_raise INTO v_id, v_salary;
+ 17          EXIT WHEN cur_raise%NOTFOUND;
+ 18
+ 19          v_raise := v_salary * 0.05;
+ 20
+ 21          UPDATE instructor
+ 22          SET salary = salary + v_raise
+ 23          WHERE CURRENT OF cur_raise;
+ 24
+ 25          INSERT INTO salary_raise_lab8
+ 26          VALUES(v_id, SYSDATE, v_raise);
+ 27
+ 28      END LOOP;
+ 29
+ 30      CLOSE cur_raise;
+ 31  END;
+ 32  /
+
+PL/SQL procedure successfully completed.
+
+SQL> --Q2
+SQL> DECLARE
+  2      CURSOR cur_students IS
+  3          SELECT id, name, dept_name, tot_cred
+  4          FROM student
+  5          ORDER BY tot_cred;
+  6
+  7      v_student cur_students%ROWTYPE;
+  8      v_count NUMBER := 0;
+  9
+ 10  BEGIN
+ 11      OPEN cur_students;
+ 12
+ 13      LOOP
+ 14          FETCH cur_students INTO v_student;
+ 15          EXIT WHEN cur_students%NOTFOUND OR v_count = 10;
+ 16
+ 17          DBMS_OUTPUT.PUT_LINE(
+ 18              v_student.id || ' ' ||
+ 19              v_student.name || ' ' ||
+ 20              v_student.dept_name || ' ' ||
+ 21              v_student.tot_cred
+ 22          );
+ 23
+ 24          v_count := v_count + 1;
+ 25      END LOOP;
+ 26
+ 27      CLOSE cur_students;
+ 28  END;
+ 29  /
+70557 Snow Physics 0
+12345 Shankar Comp. Sci. 32
+55739 Sanchez Music 38
+45678 Levy Physics 46
+54321 Williams Comp. Sci. 54
+44553 Peltier Physics 56
+76543 Brown Comp. Sci. 58
+76653 Aoi Elec. Eng. 60
+19991 Brandt History 80
+98765 Bourikas Elec. Eng. 98
+
+PL/SQL procedure successfully completed.
+
+SQL> --q3
+SQL> DECLARE
+  2  BEGIN
+  3      FOR rec_course IN (
+  4          SELECT c.course_id, c.title, c.dept_name, c.credits,
+  5                 i.name instructor_name,
+  6                 s.building, s.room_number, s.time_slot_id,
+  7                 COUNT(t.id) tot_student_no
+  8          FROM course c
+  9          JOIN section s ON c.course_id = s.course_id
+ 10          LEFT JOIN teaches te ON s.course_id = te.course_id
+ 11          LEFT JOIN instructor i ON te.id = i.id
+ 12          LEFT JOIN takes t ON s.course_id = t.course_id
+ 13          GROUP BY c.course_id, c.title, c.dept_name, c.credits,
+ 14                   i.name, s.building, s.room_number, s.time_slot_id
+ 15      )
+ 16      LOOP
+ 17          DBMS_OUTPUT.PUT_LINE(
+ 18              rec_course.course_id || ' ' ||
+ 19              rec_course.title || ' ' ||
+ 20              rec_course.dept_name || ' ' ||
+ 21              rec_course.credits || ' ' ||
+ 22              rec_course.instructor_name || ' ' ||
+ 23              rec_course.building || ' ' ||
+ 24              rec_course.room_number || ' ' ||
+ 25              rec_course.time_slot_id || ' ' ||
+ 26              rec_course.tot_student_no
+ 27          );
+ 28      END LOOP;
+ 29  END;
+ 30  /
+CS-101 Intro. to Computer Science Comp. Sci. 4 Katz Packard 101 H 7
+CS-101 Intro. to Computer Science Comp. Sci. 4 Srinivasan Packard 101 F 7
+HIS-351 World History History 3 El Said Painter 514 C 1
+CS-319 Image Processing Comp. Sci. 3 Katz Taylor 3128 C 2
+CS-101 Intro. to Computer Science Comp. Sci. 4 Srinivasan Packard 101 H 7
+PHY-101 Physical Principles Physics 4 Einstein Watson 100 A 1
+BIO-301 Genetics Biology 4 Crick Painter 514 A 1
+CS-347 Database System Concepts Comp. Sci. 3 Srinivasan Taylor 3128 A 2
+FIN-201 Investment Banking Finance 3 Wu Packard 101 B 1
+CS-319 Image Processing Comp. Sci. 3 Katz Watson 100 B 2
+CS-319 Image Processing Comp. Sci. 3 Brandt Watson 100 B 2
+CS-319 Image Processing Comp. Sci. 3 Brandt Taylor 3128 C 2
+BIO-101 Intro. to Biology Biology 4 Crick Painter 514 B 1
+MU-199 Music Video Production Music 3 Mozart Packard 101 D 1
+CS-101 Intro. to Computer Science Comp. Sci. 4 Katz Packard 101 F 7
+CS-190 Game Design Comp. Sci. 4 Brandt Taylor 3128 E 4
+CS-190 Game Design Comp. Sci. 4 Brandt Taylor 3128 A 4
+CS-315 Robotics Comp. Sci. 3 Srinivasan Watson 120 D 2
+EE-181 Intro. to Digital Systems Elec. Eng. 3 Kim Taylor 3128 C 1
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from student;
+
+ID    NAME                 DEPT_NAME              TOT_CRED
+----- -------------------- -------------------- ----------
+00128 Zhang                Comp. Sci.                  102
+12345 Shankar              Comp. Sci.                   32
+19991 Brandt               History                      80
+23121 Chavez               Finance                     110
+44553 Peltier              Physics                      56
+45678 Levy                 Physics                      46
+54321 Williams             Comp. Sci.                   54
+55739 Sanchez              Music                        38
+70557 Snow                 Physics                       0
+76543 Brown                Comp. Sci.                   58
+76653 Aoi                  Elec. Eng.                   60
+
+ID    NAME                 DEPT_NAME              TOT_CRED
+----- -------------------- -------------------- ----------
+98765 Bourikas             Elec. Eng.                   98
+98988 Tanaka               Biology                     120
+
+13 rows selected.
+
+SQL> select * from takes;
+
+ID    COURSE_I SEC_ID   SEMEST       YEAR GR
+----- -------- -------- ------ ---------- --
+00128 CS-101   1        Fall         2009 A
+00128 CS-347   1        Fall         2009 A-
+12345 CS-101   1        Fall         2009 C
+12345 CS-190   2        Spring       2009 A
+12345 CS-315   1        Spring       2010 A
+12345 CS-347   1        Fall         2009 A
+19991 HIS-351  1        Spring       2010 B
+23121 FIN-201  1        Spring       2010 C+
+44553 PHY-101  1        Fall         2009 B-
+45678 CS-101   1        Fall         2009 F
+45678 CS-101   1        Spring       2010 B+
+
+ID    COURSE_I SEC_ID   SEMEST       YEAR GR
+----- -------- -------- ------ ---------- --
+45678 CS-319   1        Spring       2010 B
+54321 CS-101   1        Fall         2009 A-
+54321 CS-190   2        Spring       2009 B+
+55739 MU-199   1        Spring       2010 A-
+76543 CS-101   1        Fall         2009 A
+76543 CS-319   2        Spring       2010 A
+76653 EE-181   1        Spring       2009 C
+98765 CS-101   1        Fall         2009 C-
+98765 CS-315   1        Spring       2010 B
+98988 BIO-101  1        Summer       2009 A
+98988 BIO-301  1        Summer       2010
+
+22 rows selected.
+
+SQL> --Q4
+SQL> BEGIN
+  2      FOR rec_stu IN (
+  3          SELECT t.id
+  4          FROM takes t
+  5          JOIN student s ON t.id = s.id
+  6          WHERE t.course_id = 'CS-101'
+  7          AND s.tot_cred < 30
+  8      )
+  9      LOOP
+ 10          DELETE FROM takes
+ 11          WHERE id = rec_stu.id
+ 12          AND course_id = 'CS-101';
+ 13      END LOOP;
+ 14  END;
+ 15  /
+
+PL/SQL procedure successfully completed.
+
+SQL> --Q5
+SQL> ALTER TABLE student ADD grade_letter VARCHAR2(2);
+
+Table altered.
+
+SQL> UPDATE student SET grade_letter='F';
+
+13 rows updated.
+
+SQL> DECLARE
+  2      CURSOR cur_grade IS
+  3          SELECT id, tot_cred
+  4          FROM student
+  5          FOR UPDATE;
+  6
+  7  BEGIN
+  8      FOR rec_grade IN cur_grade
+  9      LOOP
+ 10          IF rec_grade.tot_cred >= 100 THEN
+ 11              UPDATE student
+ 12              SET grade_letter='A'
+ 13              WHERE CURRENT OF cur_grade;
+ 14
+ 15          ELSIF rec_grade.tot_cred >= 70 THEN
+ 16              UPDATE student
+ 17              SET grade_letter='B'
+ 18              WHERE CURRENT OF cur_grade;
+ 19
+ 20          ELSIF rec_grade.tot_cred >= 40 THEN
+ 21              UPDATE student
+ 22              SET grade_letter='C'
+ 23              WHERE CURRENT OF cur_grade;
+ 24
+ 25          ELSE
+ 26              UPDATE student
+ 27              SET grade_letter='F'
+ 28              WHERE CURRENT OF cur_grade;
+ 29          END IF;
+ 30      END LOOP;
+ 31  END;
+ 32  /
+
+PL/SQL procedure successfully completed.
+
+SQL> --q6
+SQL> DECLARE
+  2      CURSOR cur_instructor(p_course_id VARCHAR2) IS
+  3          SELECT i.name
+  4          FROM instructor i
+  5          JOIN teaches t ON i.id = t.id
+  6          WHERE t.course_id = p_course_id;
+  7
+  8  BEGIN
+  9      FOR rec_inst IN cur_instructor('CS-101')
+ 10      LOOP
+ 11          DBMS_OUTPUT.PUT_LINE('Instructor: ' || rec_inst.name);
+ 12      END LOOP;
+ 13  END;
+ 14  /
+Instructor: Srinivasan
+Instructor: Katz
+
+PL/SQL procedure successfully completed.
+
+SQL> --q7
+SQL> DECLARE
+  2  BEGIN
+  3      FOR rec_student IN (
+  4          SELECT s.name
+  5          FROM student s
+  6          JOIN advisor a ON s.id = a.s_id
+  7          JOIN teaches t ON a.i_id = t.id
+  8          JOIN takes tk ON s.id = tk.id
+  9          WHERE tk.course_id = t.course_id
+ 10      )
+ 11      LOOP
+ 12          DBMS_OUTPUT.PUT_LINE('Student: ' || rec_student.name);
+ 13      END LOOP;
+ 14  END;
+ 15  /
+Student: Zhang
+Student: Shankar
+Student: Shankar
+Student: Shankar
+Student: Peltier
+Student: Brown
+Student: Brown
+Student: Aoi
+Student: Tanaka
+Student: Tanaka
+
+PL/SQL procedure successfully completed.
+
+SQL>
