@@ -1,0 +1,162 @@
+SQL> --Q1
+SQL> CREATE TABLE log_change_takes (
+  2      time_of_change TIMESTAMP,
+  3      id VARCHAR2(5),
+  4      course_id VARCHAR2(8),
+  5      sec_id VARCHAR2(8),
+  6      semester VARCHAR2(6),
+  7      year NUMBER,
+  8      grade VARCHAR2(2)
+  9  );
+
+Table created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_log_takes
+  2  AFTER INSERT OR UPDATE OR DELETE ON takes
+  3  FOR EACH ROW
+  4  BEGIN
+  5      IF INSERTING THEN
+  6          INSERT INTO log_change_takes
+  7          VALUES (SYSTIMESTAMP, :NEW.ID, :NEW.course_id,
+  8                  :NEW.sec_id, :NEW.semester, :NEW.year, :NEW.grade);
+  9
+ 10      ELSIF UPDATING THEN
+ 11          INSERT INTO log_change_takes
+ 12          VALUES (SYSTIMESTAMP, :NEW.ID, :NEW.course_id,
+ 13                  :NEW.sec_id, :NEW.semester, :NEW.year, :NEW.grade);
+ 14
+ 15      ELSIF DELETING THEN
+ 16          INSERT INTO log_change_takes
+ 17          VALUES (SYSTIMESTAMP, :OLD.ID, :OLD.course_id,
+ 18                  :OLD.sec_id, :OLD.semester, :OLD.year, :OLD.grade);
+ 19      END IF;
+ 20  END;
+ 21  /
+
+Trigger created.
+
+SQL> --q2
+SQL> CREATE TABLE Old_Data_Instructor (
+  2      ID VARCHAR2(5),
+  3      name VARCHAR2(20),
+  4      dept_name VARCHAR2(20),
+  5      salary NUMBER(8,2)
+  6  );
+
+Table created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_old_instructor
+  2  BEFORE UPDATE OF salary ON instructor
+  3  FOR EACH ROW
+  4  BEGIN
+  5      INSERT INTO Old_Data_Instructor
+  6      VALUES (:OLD.ID, :OLD.name, :OLD.dept_name, :OLD.salary);
+  7  END;
+  8  /
+
+Trigger created.
+
+SQL> --q3
+SQL> CREATE OR REPLACE TRIGGER trg_validate_instructor
+  2  BEFORE INSERT OR UPDATE ON instructor
+  3  FOR EACH ROW
+  4  DECLARE
+  5      dept_budget department.budget%TYPE;
+  6  BEGIN
+  7      -- Name validation (only alphabets)
+  8      IF NOT REGEXP_LIKE(:NEW.name, '^[A-Za-z ]+$') THEN
+  9          RAISE_APPLICATION_ERROR(-20001, 'Name must contain only alphabets');
+ 10      END IF;
+ 11
+ 12      -- Salary > 0
+ 13      IF :NEW.salary <= 0 THEN
+ 14          RAISE_APPLICATION_ERROR(-20002, 'Salary must be positive');
+ 15      END IF;
+ 16
+ 17      -- Check department budget
+ 18      SELECT budget INTO dept_budget
+ 19      FROM department
+ 20      WHERE dept_name = :NEW.dept_name;
+ 21
+ 22      IF :NEW.salary > dept_budget THEN
+ 23          RAISE_APPLICATION_ERROR(-20003, 'Salary exceeds department budget');
+ 24      END IF;
+ 25
+ 26  EXCEPTION
+ 27      WHEN NO_DATA_FOUND THEN
+ 28          RAISE_APPLICATION_ERROR(-20004, 'Department not found');
+ 29  END;
+ 30  /
+
+Trigger created.
+
+SQL> --q4
+SQL> CREATE TABLE client_master (
+  2      client_no NUMBER,
+  3      name VARCHAR2(50),
+  4      address VARCHAR2(100),
+  5      bal_due NUMBER
+  6  );
+
+Table created.
+
+SQL>
+SQL> CREATE TABLE auditclient (
+  2      client_no NUMBER,
+  3      name VARCHAR2(50),
+  4      bal_due NUMBER,
+  5      operation VARCHAR2(10),
+  6      userid VARCHAR2(30),
+  7      opdate DATE
+  8  );
+
+Table created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_audit_client
+  2  BEFORE UPDATE OR DELETE ON client_master
+  3  FOR EACH ROW
+  4  BEGIN
+  5      IF UPDATING THEN
+  6          INSERT INTO auditclient
+  7          VALUES (:OLD.client_no, :OLD.name, :OLD.bal_due,
+  8                  'UPDATE', USER, SYSDATE);
+  9
+ 10      ELSIF DELETING THEN
+ 11          INSERT INTO auditclient
+ 12          VALUES (:OLD.client_no, :OLD.name, :OLD.bal_due,
+ 13                  'DELETE', USER, SYSDATE);
+ 14      END IF;
+ 15  END;
+ 16  /
+
+Trigger created.
+
+SQL> --q5
+SQL> CREATE OR REPLACE VIEW Advisor_Student AS
+  2  SELECT a.s_ID, a.i_ID, s.name AS student_name, i.name AS instructor_name
+  3  FROM advisor a
+  4  JOIN student s ON a.s_ID = s.ID
+  5  JOIN instructor i ON a.i_ID = i.ID;
+
+View created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_delete_advisor_student
+  2  INSTEAD OF DELETE ON Advisor_Student
+  3  FOR EACH ROW
+  4  BEGIN
+  5      DELETE FROM advisor
+  6      WHERE s_ID = :OLD.s_ID
+  7        AND i_ID = :OLD.i_ID;
+  8  END;
+  9  /
+
+Trigger created.
+
+SQL>
+
+
+https://sallysbakingaddiction.com/
+https://www.marthastewart.com/easy-baking-recipes-8607758
+https://www.simplyrecipes.com/baking-recipes-5091230
+https://www.recipetineats.com/category/baking-recipes/?fwp_paged=2
+https://www.olivemagazine.com/recipes/collection/best-ever-quick-and-easy-baking-recipes-ready-in-under-an-hour/
